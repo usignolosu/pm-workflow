@@ -4,16 +4,20 @@
 # 用法：./scripts/heartbeat.sh
 set -e
 
+# Route X：活动需求目录改指 runs/<run-id>/（不再读根级 state.json）
+RUNS_DIR="$(cd "$(dirname "$0")/../runs" && pwd)"
+
 echo "=== 💓 心跳自检 · 状态摘要 ==="
 echo "时间: $(date '+%Y-%m-%d %H:%M %A')"
 echo ""
 
-# 1. 当前需求状态
-if [ -f state.json ]; then
-  echo "--- 当前状态（state.json）---"
+# 1. 当前需求状态（Route X：state.json 随 run 隔离在 runs/<run-id>/）
+STATE_FILE=$(ls -t "$RUNS_DIR"/*/state.json 2>/dev/null | head -1)
+if [ -n "$STATE_FILE" ]; then
+  echo "--- 当前状态（$STATE_FILE）---"
   python3 -c "
 import json
-s = json.load(open('state.json'))
+s = json.load(open('$STATE_FILE'))
 p = s.get('progress', {})
 print(f\"  REQ: {s.get('current_req')} | phase: {s.get('phase')} | scale: {s.get('scale')} | mode: {s.get('mode')}\")
 print(f\"  进度: {p.get('percent', '?')}% | {p.get('current_step_human', '')}\")
@@ -22,13 +26,13 @@ if s.get('bug_fix_in_progress'):
     print(f\"  ⚠️ bug 修复进行中: {s['bug_fix_in_progress']}\")
 "
 else
-  echo "  ⚠️ state.json 不存在"
+  echo "  ⚠️ runs/ 下无 state.json（B 范式可能仅用 execution-log.md 留痕）"
 fi
 echo ""
 
 # 2. 未收尾的 REQ（01_drafted 里非 DELIVERED 的）
 echo "--- 进行中 / 暂停的 REQ ---"
-for idx in 归档需求产出/*/01_drafted/INDEX.md; do
+for idx in "$RUNS_DIR"/*/01_drafted/INDEX.md; do
   req=$(basename "$(dirname "$idx")")
   st=$(grep -m1 "^state:" "$idx" | sed 's/state: *//')
   case "$st" in

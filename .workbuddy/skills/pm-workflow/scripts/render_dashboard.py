@@ -21,11 +21,18 @@ except ImportError:
     sys.exit(1)
 
 ROOT = Path(__file__).resolve().parents[4]  # B仓根: scripts→skill→skills→.workbuddy→工作流-产品
-STATE = ROOT / "state.json"
+# Route X：活动需求目录改指 runs/<run-id>/（不再读根级 state.json / 归档需求产出）
+RUNS = Path(__file__).resolve().parents[1] / "runs"
 KG_INDEX = ROOT / "knowledge_graph" / "index.jsonl"
 FEEDBACK_DIR = ROOT / "feedback_log"
 EVOLUTION_DIR = ROOT / "evolution_log"
-DELIVERABLES = ROOT / "归档需求产出"
+DELIVERABLES = RUNS  # 活动需求目录（runs/<run-id>/），内含 */03_finalized/INDEX.md
+
+
+def _latest_state_file():
+    """返回 runs/ 下最近修改的 state.json（机读状态随 run 隔离），无则 None"""
+    files = sorted(RUNS.glob("*/state.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    return files[0] if files else None
 # v4.0.1 修复：Obsidian vault 路径硬编码 → 配置化
 # 优先级：OBSIDIAN_VAULT 环境变量 > state.json obsidian_note_path > 默认值
 _DEFAULT_OBSIDIAN = Path.home() / "Documents" / "Codex" / "obsidian_ai"
@@ -35,10 +42,11 @@ def _resolve_obsidian_path() -> Path:
     env_vault = os.environ.get("OBSIDIAN_VAULT")
     if env_vault:
         return Path(env_vault) / "10-Notes" / "工作流体系" / "任务总览.md"
-    # state.json 可选覆盖
-    if STATE.exists():
+    # state.json 可选覆盖（Route X：随 run 隔离，取最近修改的一份）
+    sf = _latest_state_file()
+    if sf:
         try:
-            s = json.loads(STATE.read_text(encoding="utf-8"))
+            s = json.loads(sf.read_text(encoding="utf-8"))
             custom = s.get("obsidian_note_path")
             if custom:
                 return Path(custom)
@@ -77,8 +85,8 @@ def load_history():
     history = []
     if not DELIVERABLES.exists():
         return history
-    for idx_path in sorted(DELIVERABLES.glob("03_finalized/REQ-*/INDEX.md")):
-        req_id = idx_path.parent.name
+    for idx_path in sorted(DELIVERABLES.glob("*/03_finalized/INDEX.md")):
+        req_id = idx_path.parent.parent.name
         content = idx_path.read_text(encoding="utf-8")
         # 解析 frontmatter
         if not content.startswith("---"):

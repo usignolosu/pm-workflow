@@ -10,11 +10,18 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]  # B仓根: scripts→skill→skills→.workbuddy→工作流-产品
+# Route X：state.json 随 run 隔离在 runs/<run-id>/，不再有根级 state.json
+RUNS = Path(__file__).resolve().parents[1] / "runs"
+
+
+def _latest_state_file():
+    files = sorted(RUNS.glob("*/state.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    return files[0] if files else None
 
 
 def build_context() -> str:
-    state_file = ROOT / "state.json"
-    if not state_file.exists():
+    state_file = _latest_state_file()
+    if not state_file:
         return ""
     s = json.loads(state_file.read_text(encoding="utf-8"))
     p = s.get("progress", {})

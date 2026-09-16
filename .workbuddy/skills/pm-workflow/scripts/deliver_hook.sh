@@ -2,8 +2,10 @@
 # 交付事件钩子 — 扫描 REQ 反馈并归档 + v2.0 自动入库 KG
 # 用法：./scripts/deliver_hook.sh <req_id>
 set -e
+# Route X：活动需求目录改指 runs/<run-id>/（不再读根级 归档需求产出/）
+RUNS_DIR="$(cd "$(dirname "$0")/../runs" && pwd)"
 REQ_ID="$1"
-REVIEW_FILE="归档需求产出/$REQ_ID/02_reviewed/review.md"
+REVIEW_FILE="$RUNS_DIR/$REQ_ID/02_reviewed/review.md"
 REJECT_LOG="feedback_log/_delivery_$REQ_ID.md"
 
 echo "# $REQ_ID 交付复盘" > "$REJECT_LOG"
@@ -22,7 +24,7 @@ echo "复盘记录已写入 $REJECT_LOG"
 # -----------------------------------------------------------------------------
 echo ""
 echo "📦 v2.0 自动入库知识图谱..."
-if [ -f "归档需求产出/$REQ_ID/01_drafted/01_user_research.md" ]; then
+if [ -f "$RUNS_DIR/$REQ_ID/01_drafted/01_user_research.md" ]; then
   python3 scripts/ingest_to_kg.py --req "$REQ_ID" --mode semi-auto
 else
   echo "⚠️ 无 01_user_research.md，跳过 KG 入库"

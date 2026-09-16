@@ -10,6 +10,9 @@
 
 set -e
 
+# Route X：活动需求目录改指 runs/<run-id>/（不再写根级 归档需求产出/），state.json 随 run 隔离
+RUNS_DIR="$(cd "$(dirname "$0")/../runs" && pwd)"
+
 TITLE="$1"
 SCALE="${2:-standard}"
 CLARIFY_FLAG=""
@@ -56,14 +59,14 @@ if [ "$SCALE" != "light" ] && [ "$SCALE" != "standard" ] && [ "$SCALE" != "compl
 fi
 
 # 计算下一个 REQ 编号
-LAST=$(ls 归档需求产出/ 2>/dev/null | grep -E '^REQ-[0-9]+$' | sort -V | tail -1 | sed 's/REQ-//' || echo "000")
+LAST=$(ls "$RUNS_DIR" 2>/dev/null | grep -E '^REQ-[0-9]+$' | sort -V | tail -1 | sed 's/REQ-//' || echo "000")
 NEXT=$(printf "%03d" $((10#$LAST + 1)))
 REQ_ID="REQ-$NEXT"
 
 # 建目录
-mkdir -p "归档需求产出/$REQ_ID/01_drafted/prototype"
-mkdir -p "归档需求产出/$REQ_ID/02_reviewed"
-mkdir -p "归档需求产出/$REQ_ID/03_finalized"
+mkdir -p "$RUNS_DIR/$REQ_ID/01_drafted/prototype"
+mkdir -p "$RUNS_DIR/$REQ_ID/02_reviewed"
+mkdir -p "$RUNS_DIR/$REQ_ID/03_finalized"
 
 # v3.2 enhanced 模式：scale=complex 自动开苏格拉底 5 阶段
 # v3.3 lean 模式：所有 scale 都开（PM 视角精简）
@@ -90,7 +93,7 @@ else
 fi
 
 # 写 INDEX.md（v3.2 加 mode 字段）
-cat > "归档需求产出/$REQ_ID/01_drafted/INDEX.md" <<EOT
+cat > "$RUNS_DIR/$REQ_ID/01_drafted/INDEX.md" <<EOT
 # $REQ_ID 索引
 
 state: $INITIAL_PHASE
@@ -113,7 +116,7 @@ agents_dispatched:
 EOT
 
 # 更新 state.json（v3.2 加 mode / current_step 字段）
-# 不再整文件覆盖：保留 bug_fix_in_progress / bug_history 等历史字段，progress 重置为新 REQ 起点
+# Route X：state.json 随 run 隔离在 runs/<run-id>/，不再整文件覆盖根级状态
 TOTAL_STEPS=$([ "$MODE" = "lean_pm" ] && echo 5 || ([ "$MODE" = "enhanced_pm" ] && echo 6 || echo 4))
 if [ "$INITIAL_PHASE" = "CLARIFYING_5PHASE" ] || [ "$INITIAL_PHASE" = "CLARIFYING" ]; then
   STEP_HUMAN="需求澄清"
@@ -138,7 +141,7 @@ cat > "$STATE_NEW" <<EOT
   "current_step": "${START_STEP:-1_clarifying}",
   "clarification_pending": $([ "$CLARIFICATION_PENDING" = "null" ] && echo "null" || echo "\"$CLARIFICATION_PENDING\""),
   "clarification_skipped": $([ "$CLARIFICATION_PENDING" = "null" ] && echo "true" || echo "false"),
-  "clarification_mode": $([ "$CLARIFICATION_PENDING" = "5phase" ] && echo '"socratic-5phase"' || echo '"scale-dependent"'),
+  "clarification_mode": $([ "$CLARIFICATION_PENDING" = "5phase" ] && echo '"socratic-5phases"' || echo '"scale-dependent"'),
   "updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "progress": {
     "current_step": "${START_STEP:-1_clarifying}",
@@ -152,11 +155,14 @@ cat > "$STATE_NEW" <<EOT
 }
 EOT
 
-python3 - "$STATE_NEW" <<'PY'
+python3 - "$STATE_NEW" <<PY
 import json, sys
 from pathlib import Path
 new = json.load(open(sys.argv[1], encoding="utf-8"))
-p = Path("state.json")
+# Route X：state.json 随 run 隔离在 runs/<run-id>/（不再写根级）
+p = Path("$RUNS_DIR") / "$REQ_ID" / "state.json"
+p.parent.mkdir(parents=True, exist_ok=True)
+# 同一 run 内保留历史 bug 字段（如有），否则写全新状态
 old = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
 for k in ("bug_fix_in_progress", "bug_history"):
     if k in old and k not in new:
@@ -167,7 +173,7 @@ rm -f "$STATE_NEW"
 
 echo "✅ 已创建 $REQ_ID（scale: $SCALE, mode: $MODE）"
 echo "   标题: $TITLE"
-echo "   INDEX: 归档需求产出/$REQ_ID/01_drafted/INDEX.md"
+echo "   INDEX: $RUNS_DIR/$REQ_ID/01_drafted/INDEX.md"
 echo ""
 
 if [ "$SCALE" == "light" ]; then
@@ -214,7 +220,7 @@ fi
 echo ""
 if [ "$MERGED_PRD" = "true" ]; then
   echo "📋 合并稿模式已启用（v4.0.1）：Specialists产出合并入 prd.md，不创建 01_~05_ 子文件"
-  echo "   校验器请用: --file 归档需求产出/$REQ_ID/01_drafted/prd.md"
+  echo "   校验器请用: --file $RUNS_DIR/$REQ_ID/01_drafted/prd.md"
 fi
 echo ""
 echo "下一步：supervisor自动判断是否进入澄清门，然后调度Specialists。"

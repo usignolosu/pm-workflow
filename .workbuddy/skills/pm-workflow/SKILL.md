@@ -215,17 +215,30 @@ $PY .workbuddy/skills/pm-workflow/scripts/query_kg.py
 
 ```
 工作流-产品/
-├── runs/<run-id>/                     # 本次运行过程留痕
-│   ├── execution-log.md
+├── runs/<run-id>/                     # ★ 活动需求目录（B 范式唯一真源）
+│   ├── execution-log.md               #   过程留痕（人读，替代根级 state.json）
+│   ├── state.json                     #   机读状态（随 run 隔离，替代根级 state.json）
 │   ├── clarify.md  research.md  scenarios.md  journey-map.md  story-map.md
 │   ├── feature-table.md  wireframe.md  prd.md  test-cases.md
 │   ├── prototype/                     # 高保真 React 代码 + index.html
 │   └── screenshots/                   # 页面截图（PRD §6 引用）
-├── <需求名>需求产出/                   # 可见交付副本（长期归口）
-├── 归档需求产出/<REQ-ID>/              # 历史归档（示例仓库迁入，保留原编号）
+├── <需求名>需求产出/                   # 可见交付副本（长期归口，活动流程最终落盘处）
+├── 归档需求产出/<REQ-ID>/              # ★ 只读历史归档（示例仓库迁入 REQ-001/002/004/005，不再写入）
 ├── contracts/                          # 契约（宪法/guardrails/spec_checklist）
 └── knowledge_graph/                    # 知识图谱
 ```
+
+> **范式说明（Route X · 弃用 A 切 B）**：
+> - `归档需求产出/` 仅为**只读历史档案**，保留 示例仓库并入时的原 REQ 编号，活动工作流永不写入；仅 `validate_contract.py`、`ingest_to_kg.py` 读取它做契约校验与 KG 入库。
+> - 原 A 范式脚本（`new_requirement.sh`/`clarify.py`/`bug_fix.sh`/`heartbeat.sh`/`deliver_hook.sh`/`render_dashboard.py`/`state_context.py`/`pre_commit_gate_check.py`）的写目标已从根级 `归档需求产出/` 与根级 `state.json` **重定向到 `runs/<run-id>/`**，根级 `state.json` 不再被创建。这些脚本属 A 范式遗留工具，B 范式会话内角色切换不主动调用它们。
+> - `runs/<run-id>/execution-log.md` 是活动状态的「人读真源」；`runs/<run-id>/state.json` 是「机读真源」（每需求独立，互不干扰）。
+
+> **命名约定（三层目录，语义不混）**：
+> 1. `runs/<run-id>/` —— **过程留痕层**：一次完整运行的所有中间产物 + 状态，可随时删除重建，不影响交付。
+> 2. `<需求名>需求产出/` —— **交付归口层**：面向人/评审的最终产物落盘处（PRD、原型、截图、用例），命名统一为「<项目名>需求产出」（如 `示例需求产出/`）。
+> 3. `归档需求产出/<REQ-ID>/` —— **只读历史层**：仅 示例仓库并入的 REQ-001/002/004/005，永不写入。
+> - 同一需求的 `runs/<run-id>/` 与 `<需求名>需求产出/` 是**同一份交付的两个视图**（过程 vs 归口），非冗余副本；历史 `归档需求产出/` 不在该链条内。
+> - ⚠️ 现有根级目录命名尚未完全统一（如 `示例A需求产出/`、`示例B需求产出/` 为旧名），后续统一为「<项目名>需求产出/」需单独决策，不在本次自动化范围内。
 
 ---
 
@@ -240,3 +253,13 @@ $PY .workbuddy/skills/pm-workflow/scripts/query_kg.py
 - [ ] ⑥ 低保真 → **人工门 3**（通过后锁定标注编号）
 - [ ] ⑦ PRD + 高保真 + 用例（+ 代码，若 `deliver_code=true`）
 - [ ] ⑧ QA 评审 + 来源标注 → **人工门 4** → 归档到 `<需求名>需求产出/`
+
+---
+
+## 10. 前端脚本依赖（修 #3：原未声明）
+
+`scripts/render_cards.js` 与 `scripts/gen_screenshots.js` 依赖 `puppeteer-core`（已声明于本目录 `package.json`）。
+
+- 安装：`cd .workbuddy/skills/pm-workflow && npm install`（或在受管 node workspace 安装后靠 `NODE_PATH` 提供）
+- 运行仍需系统 Google Chrome（路径可用 `CHROME_PATH` 环境变量覆盖）
+- 受管运行时已预装 `puppeteer-core` 于 `~/.workbuddy/binaries/node/workspace/node_modules`，可直接以 `NODE_PATH=~/.workbuddy/binaries/node/workspace/node_modules` 运行。

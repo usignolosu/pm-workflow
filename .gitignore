@@ -13,3 +13,9 @@
 *.log
 *.tmp
 /tmp/
+
+# Python 缓存
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class

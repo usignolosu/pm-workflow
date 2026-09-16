@@ -12,6 +12,19 @@
 set -e
 cd "$(dirname "$0")/.."
 
+# Route X：活动需求目录改指 runs/<run-id>/（不再写根级 归档需求产出/），state.json 随 run 隔离
+RUNS_DIR="$(pwd)/runs"
+
+# 解析 state.json 路径：优先 runs/<REQ_ID>/state.json；REQ_ID 缺失时扫描含该 bug 的 run
+resolve_state() {
+  if [ -n "$REQ_ID" ] && [ -f "$RUNS_DIR/$REQ_ID/state.json" ]; then
+    echo "$RUNS_DIR/$REQ_ID/state.json"; return
+  fi
+  local f
+  f=$(grep -rl "\"bug_id\": \"$BUG_ID\"" "$RUNS_DIR"/*/state.json 2>/dev/null | head -1)
+  echo "${f:-$RUNS_DIR/${REQ_ID:-REQ-000}/state.json}"
+}
+
 LIST_FLAG=""
 CLOSE_FLAG=""
 REQ_ID=""
@@ -42,13 +55,13 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-STATE="state.json"
+STATE="$(resolve_state)"
 
 # === --list 模式 ===
 if [ "$LIST_FLAG" = "list" ]; then
   echo "🐛 当前 REQ 的缺陷列表："
   echo ""
-  for tr in 归档需求产出/REQ-*/03_finalized/implementation/test_report.md; do
+  for tr in "$RUNS_DIR"/REQ-*/03_finalized/implementation/test_report.md; do
     if [ ! -f "$tr" ]; then continue; fi
     REQ=$(basename $(dirname $(dirname $tr)))
     echo "=== $REQ ==="
@@ -124,8 +137,8 @@ echo "   BUG-ID:  $BUG_ID"
 echo "   Severity: $SEVERITY"
 echo ""
 
-# 读 test_report.md 找 bug 详情
-TR_PATH="归档需求产出/$REQ_ID/03_finalized/implementation/test_report.md"
+# 读 test_report.md 找 bug 详情（Route X：改指 runs/<run-id>/）
+TR_PATH="$RUNS_DIR/$REQ_ID/03_finalized/implementation/test_report.md"
 if [ -f "$TR_PATH" ]; then
   echo "📄 找到 test_report.md，bug 详情："
   grep -A 3 "$BUG_ID" "$TR_PATH" | head -5

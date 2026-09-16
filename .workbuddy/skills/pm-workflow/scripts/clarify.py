@@ -20,34 +20,42 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[4]  # B仓根: scripts→skill→skills→.workbuddy→工作流-产品
 QUESTIONS_YAML = ROOT / "workflow" / "clarification_questions.yaml"
 TEMPLATE = ROOT / "templates" / "clarification.md"
-STATE = ROOT / "state.json"
+# Route X：活动需求目录改指 runs/<run-id>/（不再写根级 归档需求产出/），state.json 随 run 隔离
+RUNS = Path(__file__).resolve().parents[1] / "runs"
 
 
 # ========== 工具 ==========
-def _read_state():
-    return json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else {}
+def _state_path(req_id):
+    return RUNS / req_id / "state.json"
 
 
-def _save_state(state):
-    STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+def _read_state(req_id):
+    p = _state_path(req_id)
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+
+
+def _save_state(req_id, state):
+    p = _state_path(req_id)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def _output_path(req_id):
-    return ROOT / "归档需求产出" / req_id / "01_drafted" / "01_clarifications.md"
+    return RUNS / req_id / "01_drafted" / "01_clarifications.md"
 
 
 def _load_questions():
     return yaml.safe_load(QUESTIONS_YAML.read_text(encoding="utf-8"))
 
 
-def _set_phase(state, phase, skipped):
+def _set_phase(req_id, state, phase, skipped):
     """统一处理状态切换"""
     state["phase"] = phase
     state["clarification_pending"] = None
     state["clarification_skipped"] = skipped
     state["step"] = "起草准备"
     state["updated"] = datetime.now().isoformat()
-    _save_state(state)
+    _save_state(req_id, state)
 
 
 def _check_answers(md_path):
@@ -135,7 +143,7 @@ def action_submit(req_id, answers_file):
 def action_skip(req_id):
     _set_phase(_read_state(), "DRAFTING", True)
     # 同步 01_clarifications.md 和 INDEX.md 的 clarification_skipped 标记
-    req_dir = ROOT / "归档需求产出" / req_id / "01_drafted"
+    req_dir = RUNS / req_id / "01_drafted"
     for name in ("01_clarifications.md", "INDEX.md"):
         f = req_dir / name
         if not f.exists():
@@ -146,7 +154,7 @@ def action_skip(req_id):
 
 
 def action_check(req_id):
-    state = _read_state()
+    state = _read_state(req_id)
     out = _output_path(req_id)
     answered = _check_answers(out) if out.exists() else set()
     print(f"📊 {req_id} 澄清门状态")
