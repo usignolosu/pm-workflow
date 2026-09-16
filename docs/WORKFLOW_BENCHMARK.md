@@ -115,4 +115,4 @@
 
 ---
 
-*本对标报告由「产品自动化工作流 v7.0.0」系统产出 · 2026-09-16 · 与 `.workbuddy/skills/产品自动化工作流/SKILL.md` §11 同步*
+*本对标报告由「Pm Workflow v7.0.0」系统产出 · 2026-09-16 · 与 `.workbuddy/skills/pm-workflow/SKILL.md` §11 同步*

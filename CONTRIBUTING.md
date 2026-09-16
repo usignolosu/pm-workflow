@@ -1,6 +1,6 @@
 # 贡献指南
 
-> 感谢你考虑为 **产品自动化工作流** 贡献代码或文档。本项目以 MIT 协议开源，欢迎 PR、Issue、Discussion。
+> 感谢你考虑为 **Pm Workflow** 贡献代码或文档。本项目以 MIT 协议开源，欢迎 PR、Issue、Discussion。
 
 ---
 
@@ -67,11 +67,11 @@ g021：扫描 PRD 中对已 ABANDONED 标记 REQ 的引用，发现即 warn。
 ```bash
 # 1) 链路自检（必须 10/10）
 PY=$HOME/.workbuddy/binaries/python/envs/default/bin/python
-$PY .workbuddy/skills/产品自动化工作流/scripts/self_check.py
+$PY .workbuddy/skills/pm-workflow/scripts/self_check.py
 
 # 2) 契约校验（不得新增 fail）
-$PY .workbuddy/skills/产品自动化工作流/scripts/validate_contract.py \
-  --file .workbuddy/skills/产品自动化工作流/runs/self-check/sample_prd.md \
+$PY .workbuddy/skills/pm-workflow/scripts/validate_contract.py \
+  --file .workbuddy/skills/pm-workflow/runs/self-check/sample_prd.md \
   --agent bingbu --scale complex --strictness strict --merged-prd
 ```
 
@@ -95,7 +95,7 @@ $PY -m pip install -r requirements.txt
 export NODE_PATH=$HOME/.workbuddy/binaries/node/workspace/node_modules
 
 # 5. 验证
-$PY .workbuddy/skills/产品自动化工作流/scripts/self_check.py
+$PY .workbuddy/skills/pm-workflow/scripts/self_check.py
 ```
 
 > **Linux/Windows 用户**：受管运行时路径不同。请改用 `which python3` 自行定位，并把 `self_check.py` 中固定路径改为环境变量。
@@ -110,10 +110,10 @@ $PY .workbuddy/skills/产品自动化工作流/scripts/self_check.py
 - **PATCH**：bug 修复 / 文档更正
 
 发布时：
-1. 更新 `.workbuddy/skills/产品自动化工作流/SKILL.md` 顶部版本号
+1. 更新 `.workbuddy/skills/pm-workflow/SKILL.md` 顶部版本号
 2. 更新 README 顶部 badge
 3. 打 git tag：`git tag -a v7.1.0 -m "..."`
-4. 在 GitHub Releases 写变更说明（参考 [CHANGELOG 样例](.workbuddy/skills/产品自动化工作流/runs/self-check/execution-log.md) 末尾）
+4. 在 GitHub Releases 写变更说明（参考 [CHANGELOG 样例](.workbuddy/skills/pm-workflow/runs/self-check/execution-log.md) 末尾）
 
 ---
 

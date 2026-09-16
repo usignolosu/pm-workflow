@@ -1,7 +1,7 @@
-# 产品自动化工作流 · 流程图（v7.0.0）
+# Pm Workflow · 流程图（v7.0.0）
 
-> **路径**：`$HOME/Documents/workbuddy/工作流-产品/`（项目工作区 + 项目级 Skill）
-> **形态**：Skill 形态（`.workbuddy/skills/产品自动化工作流/SKILL.md`），不是独立系统、不是插件
+> **路径**：`<workspace>/`（项目工作区 + 项目级 Skill）
+> **形态**：Skill 形态（`.workbuddy/skills/pm-workflow/SKILL.md`），不是独立系统、不是插件
 > **版本**：v7.0.0（2026-09-16 · 合并两套工作流后定稿）
 > **来源**：原 示例仓库 `docs/FLOW_DIAGRAM.md`（v5.1/v6.0，三省六部·24 状态·lean_pm/standard/enhanced）已废弃——本文件为合并版
 > **执行主体**：单一 WorkBuddy 会话内由 agent 扮演多个角色（无独立进程、无 MCP spawn）
@@ -217,4 +217,4 @@ kg_refs:
 
 ---
 
-*本文档由「产品自动化工作流 v7.0.0」系统产出 · 2026-09-16 · 与 `.workbuddy/skills/产品自动化工作流/SKILL.md` 同步*
+*本文档由「Pm Workflow v7.0.0」系统产出 · 2026-09-16 · 与 `.workbuddy/skills/pm-workflow/SKILL.md` 同步*

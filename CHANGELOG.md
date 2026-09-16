@@ -1,6 +1,6 @@
 # Changelog
 
-产品自动化工作流的所有显著变更均记录于此。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
+Pm Workflow的所有显著变更均记录于此。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
 ---
 
@@ -11,7 +11,7 @@
 合并两两套工作流（示例仓库 v5.1/v6.0 + B 仓 v7.0.0）后定稿。
 
 #### 形态
-- **独立 CLI → Skill 形态**：从 `.workbuddy/skills/产品自动化工作流/SKILL.md` 加载，由 WorkBuddy 项目级调度
+- **独立 CLI → Skill 形态**：从 `.workbuddy/skills/pm-workflow/SKILL.md` 加载，由 WorkBuddy 项目级调度
 - 无独立进程、无 MCP spawn，**会话内 agent 内扮演多角色**
 
 #### 角色

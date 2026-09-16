@@ -34,7 +34,7 @@ assignees: []
 ## 自检输出
 
 ```bash
-$PY .workbuddy/skills/产品自动化工作流/scripts/self_check.py
+$PY .workbuddy/skills/pm-workflow/scripts/self_check.py
 ```
 
 （粘贴完整输出）
@@ -42,7 +42,7 @@ $PY .workbuddy/skills/产品自动化工作流/scripts/self_check.py
 ## 契约校验输出（如适用）
 
 ```bash
-$PY .workbuddy/skills/产品自动化工作流/scripts/validate_contract.py --file <PRD 路径> --agent bingbu --scale complex --strictness strict --merged-prd
+$PY .workbuddy/skills/pm-workflow/scripts/validate_contract.py --file <PRD 路径> --agent bingbu --scale complex --strictness strict --merged-prd
 ```
 
 ## 截图 / 日志

@@ -1,14 +1,23 @@
 ---
-name: 产品自动化工作流
-description: 产品需求到 PRD + 原型 + 测试用例的自动化工作流。当用户提出产品想法/需求/改动，需要系统化地产出 PRD 文档、低保真/高保真原型、用户旅程图、业务流程图与测试用例时使用。覆盖三种模式（轻量/常规/复杂）、四处人工确认门、13 角色智能体编队、机器契约校验与知识图谱追溯。触发词：产品工作流、PRD、产品需求、画原型、用户旅程图、功能表、产品自动化。
+name: pm-workflow
+description: 将一句话产品需求转化为 14 模块 PRD + 高保真原型 + 测试用例的自动化产品工作流。支持 3 种规模（轻量/常规/复杂）与 deliver_code 开关，含 13 角色编队、4 道人工确认门、20 条机器防线（validate_contract.py）与 128 实体知识图谱追溯。触发词：产品工作流、PRD、产品需求、画原型、用户旅程图、功能表、产品自动化。
+license: MIT
+compatibility: 兼容 Anthropic AgentSkills 规范；同一份技能目录可复制到 Claude Code / Codex / dsh / OpenClaw / ZCode / Hermes / Trae / OpenCode 的 skills 根目录共用。
+metadata:
+  hermes:
+    runtime:
+      bins: [python3, node]
+    triggers: [产品工作流, PRD, 产品需求, 画原型, 用户旅程图]
 ---
 
-# 产品自动化工作流（v7.0.0 · 合并统一版）
+> **跨 Agent 单源包**：本技能遵循 Anthropic AgentSkills 规范，一份 `pm-workflow/` 目录可被 8 家 agent（Claude Code / Codex / dsh / OpenClaw / ZCode / Hermes / Trae / OpenCode）直接共用——只需复制到对应 skills 根目录，详见仓库 README「跨 Agent 安装」一节。
+
+# Pm Workflow（v7.0.0 · 合并统一版）
 
 > 一句话需求 → 背景调研 → 行业调研与用例转写 → 场景梳理 + 用户旅程图 → 功能表 → 低保真原型 → 高保真原型 + 完整 PRD + 测试用例 → QA 评审。
 > 全程在 WorkBuddy 会话内闭环，本地文档不出机；高危环节暂停请求用户确认。
 
-> **v7.0.0 合并说明**：本技能已合并姊妹仓「姊妹工作流仓库」（`$HOME/Documents/姊妹工作流仓库`）的工程化资产——契约校验、状态机、知识图谱、18 个脚本。
+> **v7.0.0 合并说明**：本技能已合并姊妹仓「姊妹工作流仓库」（已归档）的工程化资产——契约校验、状态机、知识图谱、18 个脚本。
 > 那 8 个 `references/roles/*/SKILL.md` **不是** WorkBuddy Skill，只是「角色工作说明书」的文件命名；调度 = 换提示词，不启动进程。
 
 ---
@@ -185,8 +194,8 @@ description: 产品需求到 PRD + 原型 + 测试用例的自动化工作流。
 运行示例：
 ```bash
 PY=$HOME/.workbuddy/binaries/python/versions/3.13.12/bin/python3
-$PY .workbuddy/skills/产品自动化工作流/scripts/validate_contract.py --req REQ-001 --agent hubu --scale standard --strictness strict
-$PY .workbuddy/skills/产品自动化工作流/scripts/query_kg.py
+$PY .workbuddy/skills/pm-workflow/scripts/validate_contract.py --req REQ-001 --agent hubu --scale standard --strictness strict
+$PY .workbuddy/skills/pm-workflow/scripts/query_kg.py
 ```
 
 > ⚠️ **`gen_screenshots.js` 的两个前置条件**（手工调用易漏）：

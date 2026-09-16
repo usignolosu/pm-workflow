@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-self_check.py — 产品自动化工作流 Skill 功能自校验
+self_check.py — Pm Workflow Skill 功能自校验
 
 自动校验脚本层能否协同工作（不含 LLM 内容生成，那部分在 Skill 运行时由角色产出）：
   建示例知识库 → ingest → retrieve(验证检索命中) → build_graph → gen_prototype → report_status
@@ -43,7 +43,7 @@ def main():
     args = ap.parse_args()
 
     print("="*56)
-    print(" 产品自动化工作流 · 功能自校验")
+    print(" Pm Workflow · 功能自校验")
     print("="*56)
 
     # 1) 建示例知识库源
@@ -101,8 +101,8 @@ def main():
     node = shutil.which("node")
     if not node:
         for cand in [
-            "$HOME/.workbuddy/binaries/node/versions/22.22.2/bin/node",
-            "$HOME/.workbuddy/binaries/node/versions/22.22.3/bin/node",
+            os.path.expanduser("~/.workbuddy/binaries/node/versions/22.22.2/bin/node"),
+            os.path.expanduser("~/.workbuddy/binaries/node/versions/22.22.3/bin/node"),
         ]:
             if os.path.exists(cand):
                 node = cand
@@ -118,7 +118,7 @@ def main():
                 break
     if node and chrome:
         env = os.environ.copy()
-        env["NODE_PATH"] = "$HOME/.workbuddy/binaries/node/workspace/node_modules"
+        env["NODE_PATH"] = os.path.expanduser("~/.workbuddy/binaries/node/workspace/node_modules")
         shots_out = os.path.join(proto_out, "screenshots")
         r = subprocess.run(
             [node, os.path.join(SCRIPTS, "gen_screenshots.js"),

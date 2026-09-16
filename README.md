@@ -1,4 +1,4 @@
-# 产品自动化工作流（Product Automation Workflow）
+# Pm Workflow · 产品自动化工作流
 
 > 一句话需求 → PRD + 高保真原型 + 截图 · Skill 形态 · 单循环 8 阶段 · 13 常驻角色 + 3 复杂扩展
 
@@ -9,6 +9,51 @@
 [![KG entities](https://img.shields.io/badge/KG-128-success.svg)](knowledge_graph/index.jsonl)
 
 让 PRD 流水线**像自来水一样跑起来**：一句话开局、13 角色串场、20 条机器防线自动把关、4 道人工门拍板，全程 **60 分钟**一次跑通。
+
+---
+
+## 跨 Agent 安装（8 家通用 · 单源包）
+
+本技能遵循 **Anthropic AgentSkills 规范**，一份 `pm-workflow/` 目录可被 8 家 agent 直接共用，**无需为每家重写**（不搞多份 fork）。
+
+| Agent | skills 根目录（放同一份 `pm-workflow/` 即可） |
+|---|---|
+| **Claude Code** | `~/.claude/skills/` 或项目 `.claude/skills/` |
+| **Codex (OpenAI)** | `~/.codex/skills/` · `.codex/skills/` · `.agents/skills/` |
+| **dsh (DeepSeek)** | `.dsh/skills/` · `~/.dsh/skills/` · `.agents/skills/` |
+| **OpenClaw** | `~/.openclaw/workspace/skills/` |
+| **ZCode** | `~/.zcode/skills/`（支持从 Claude/Codex/OpenClaw **一键导入**） |
+| **Hermes** | Hermes skills 目录（额外读取 `metadata.hermes` 块，其他家忽略） |
+| **Trae** | `.trae/skills/` · `~/.trae/skills/` · `.agents/skills/` |
+| **OpenCode** | `.opencode/skills/` · `~/.config/opencode/skills/` · `.claude/skills/` · `.agents/skills/` |
+
+**安装（任选其一）**：
+
+```bash
+# 方式 A：复制（各 agent 独立副本）
+git clone https://github.com/usignolosu/pm-workflow.git /tmp/pm-workflow
+cp -r /tmp/pm-workflow/.workbuddy/skills/pm-workflow ~/.claude/skills/pm-workflow
+# 也可改为上表中任一家的 skills 根目录
+
+# 方式 B：软链（改一份、8 家同时更新，推荐）
+ln -s "$(pwd)/.workbuddy/skills/pm-workflow" ~/.claude/skills/pm-workflow
+```
+
+> **省事提示**：OpenCode / Codex / Trae / dsh 都会自动扫描 `.claude/skills/` 与 `.agents/skills/`。
+> 把 `pm-workflow/` 丢进 `~/.claude/skills/` 一个位置，Claude Code + OpenCode + Codex + dsh + ZCode(导入) 就都拿到了。
+> **ZCode** 还可在其界面用「从 Claude/Codex/OpenClaw 导入」直接拉取，无需手动复制。
+
+**跨 Agent 兼容性对照**：
+
+| 差异点 | 处理方式（仍是同一份文件） |
+|---|---|
+| `name` 必须 kebab-case 且与目录名一致 | `name: pm-workflow`（满足 OpenCode/dsh/Trae 硬约束） |
+| `description` 长度上限 | 已聚焦至 ≤1024 字符（满足 OpenCode/ZCode 上限） |
+| Hermes 私有多余字段 | `metadata.hermes` 块写进 frontmatter，其他 7 家直接忽略 |
+| Codex 侧车元信息 | `openai.yaml` 侧车文件，仅 Codex 读取，其他家忽略 |
+| 正文 / PRD 模板 / 契约 / 知识图谱 / 脚本 | 100% 平台无关，原样共享 |
+
+> **运行时差异**：脚本依赖 Python3 + Node + 系统 Chrome。本仓库示例用的是 WorkBuddy 受管运行时路径，在其他 agent 下请把 `python3`/`node` 指向你自己的运行时（或补 `PATH`/`NODE_PATH`）。
 
 ---
 
@@ -34,13 +79,14 @@
 
 ## 二、它是什么
 
-**产品自动化工作流**是一套面向 PM 的 Skill 形态工作流，能把「一句话需求」自动转成
-**14 模块 PRD + 高保真可交互原型 + 测试用例集 + 来源标注**，全过程在 **WorkBuddy 会话内**
-由 agent 扮演多个角色完成，**无独立进程、无 MCP spawn**。
+**Pm Workflow**是一套面向 PM 的 Skill 形态工作流，能把「一句话需求」自动转成
+**14 模块 PRD + 高保真可交互原型 + 测试用例集 + 来源标注**，全过程在 **agent 会话内**
+由多角色协作完成，**无独立进程、无 MCP spawn**。它遵循 Anthropic AgentSkills 规范，
+同一份目录可被 **Claude Code / Codex / dsh / OpenClaw / ZCode / Hermes / Trae / OpenCode** 共用（详见上方「跨 Agent 安装」）。
 
-- **形态**：WorkBuddy 项目级 Skill（`.workbuddy/skills/产品自动化工作流/`）
-- **运行主体**：单一 WorkBuddy 会话内的 agent 内扮演多角色
-- **语言**：Python 3.13（managed）+ Node 22（managed） + 系统 Google Chrome
+- **形态**：AgentSkills 兼容 Skill（`.workbuddy/skills/pm-workflow/`），在 WorkBuddy 下为项目级加载
+- **运行主体**：单一 agent 会话内多角色协作
+- **语言**：Python 3 + Node + 系统 Google Chrome（各 agent 受管运行时路径见上方说明）
 
 ---
 
@@ -113,7 +159,7 @@ NODE_PATH=$HOME/.workbuddy/binaries/node/workspace/node_modules
 在 WorkBuddy 项目根目录下：
 
 ```bash
-# 工作流 Skill 已在 .workbuddy/skills/产品自动化工作流/
+# 工作流 Skill 已在 .workbuddy/skills/pm-workflow/
 # 让 WorkBuddy 加载它即可使用
 ```
 
@@ -145,7 +191,7 @@ NODE_PATH=$HOME/.workbuddy/binaries/node/workspace/node_modules
 
 ```
 pm-workflow/
-├── .workbuddy/skills/产品自动化工作流/   ← Skill 本体（145 文件）
+├── .workbuddy/skills/pm-workflow/   ← Skill 本体（145 文件）
 │   ├── SKILL.md                         ← 主入口
 │   ├── scripts/                        ← 26 个脚本（self_check / validate_contract / gen_screenshots / ...）
 │   ├── references/                     ← 角色 / 工作流 / 模板

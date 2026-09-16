@@ -1,4 +1,4 @@
-# 产品自动化工作流 · Python 依赖
+# Pm Workflow · Python 依赖
 # 示例仓库（姊妹工作流仓库）脚本迁来时缺依赖声明，系统 python 直接跑会报
 #   ERROR: 需要安装 PyYAML
 # 用受管 venv 安装：

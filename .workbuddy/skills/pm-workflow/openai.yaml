@@ -1,0 +1,15 @@
+# openai.yaml — Codex (OpenAI) 侧车配置。
+# 本文件仅 Codex CLI 读取，其他 agent（Claude Code / dsh / OpenClaw / ZCode /
+# Hermes / Trae / OpenCode）直接忽略，互不冲突。
+name: pm-workflow
+description: Pm Workflow — 将一句话产品需求转化为 14 模块 PRD + 高保真原型 + 测试用例。
+version: 7.0.0
+# 运行时依赖（Codex 缺环境时据此提示安装）
+requires:
+  bins:
+    - python3
+    - node
+  python_packages:
+    - pyyaml
+  node_packages:
+    - puppeteer-core

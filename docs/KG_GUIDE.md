@@ -1,6 +1,6 @@
 # 知识图谱使用指南（v7.0.0）
 
-> **项目路径**：`$HOME/Documents/workbuddy/工作流-产品/`
+> **项目路径**：`<workspace>/`
 > **引入版本**：v3.0.0（2026-07-03，示例仓库首版）→ v7.0.0（2026-09-16，合并后定稿）
 > **关联契约**：`contracts/schema/kg_contract.yaml`、`contracts/schema/agent_contracts.yaml`
 > **数据规模**：128 实体 / 49 文件（合并 示例仓库 22 实体 + 本工作区演化 106 实体）
@@ -46,16 +46,16 @@
 PY=$HOME/.workbuddy/binaries/python/envs/default/bin/python
 
 # 按 entity_id 精确查
-$PY .workbuddy/skills/产品自动化工作流/scripts/query_kg.py \
+$PY .workbuddy/skills/pm-workflow/scripts/query_kg.py \
   --entity REQ-001.PERSONA.001
 
 # 按类型查
-$PY .workbuddy/skills/产品自动化工作流/scripts/query_kg.py --type persona
-$PY .workbuddy/skills/产品自动化工作流/scripts/query_kg.py --type scenario
-$PY .workbuddy/skills/产品自动化工作流/scripts/query_kg.py --type insight
+$PY .workbuddy/skills/pm-workflow/scripts/query_kg.py --type persona
+$PY .workbuddy/skills/pm-workflow/scripts/query_kg.py --type scenario
+$PY .workbuddy/skills/pm-workflow/scripts/query_kg.py --type insight
 
 # 按关键词过滤
-$PY .workbuddy/skills/产品自动化工作流/scripts/query_kg.py \
+$PY .workbuddy/skills/pm-workflow/scripts/query_kg.py \
   --type scenario --keyword "回测"
 ```
 
@@ -63,11 +63,11 @@ $PY .workbuddy/skills/产品自动化工作流/scripts/query_kg.py \
 
 ```bash
 # 把外部材料（PRD 文档 / 调研报告 / 上轮 PR）灌入知识库
-$PY .workbuddy/skills/产品自动化工作流/scripts/ingest.py \
+$PY .workbuddy/skills/pm-workflow/scripts/ingest.py \
   --src "/path/to/materials" --out runs/<run-id>/kb
 
 # 按自然语言查
-$PY .workbuddy/skills/产品自动化工作流/scripts/retrieve.py \
+$PY .workbuddy/skills/pm-workflow/scripts/retrieve.py \
   --kb runs/<run-id>/kb --query "技术指标 回测 策略" --top 5
 ```
 
@@ -80,7 +80,7 @@ $PY .workbuddy/skills/产品自动化工作流/scripts/retrieve.py \
 把本轮产出的需求 PRD / 原型 / 用例沉淀为新实体，供后续需求检索：
 
 ```bash
-$PY .workbuddy/skills/产品自动化工作流/scripts/ingest_to_kg.py \
+$PY .workbuddy/skills/pm-workflow/scripts/ingest_to_kg.py \
   --req REQ-007 --src runs/<run-id>/
 ```
 
@@ -171,7 +171,7 @@ knowledge_graph/
 
 | 维度 | 示例仓库 v3.x | 本工作区 v7.0.0 | 变化原因 |
 |---|---|---|---|
-| 路径 | `$HOME/Documents/姊妹工作流仓库/` | `$HOME/Documents/workbuddy/工作流-产品/` | 合并 |
+| 路径 | `姊妹工作流仓库（已归档姊妹仓）/` | `<workspace>/` | 合并 |
 | 旧称 | 三省六部 agent 名 | `libu` / `bingbu` / `shangshu` / `menxia` 等 slug | 清旧名，按职能命名 |
 | 实体数 | 22（仅 guardrail） | **128**（+Lesson +Persona +Scenario） | 合并时补齐 |
 | 强制项 | 仅校验存在 | **校验存在 + 至少 1 counter_example** | 防模板污染（实战需要） |
@@ -179,4 +179,4 @@ knowledge_graph/
 
 ---
 
-*本指南由「产品自动化工作流 v7.0.0」系统产出 · 2026-09-16*
+*本指南由「Pm Workflow v7.0.0」系统产出 · 2026-09-16*
