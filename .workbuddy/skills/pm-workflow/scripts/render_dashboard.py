@@ -22,7 +22,20 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parents[4]  # B仓根: scripts→skill→skills→.workbuddy→工作流-产品
 # Route X：活动需求目录改指 runs/<run-id>/（不再读根级 state.json / 归档需求产出）
-RUNS = Path(__file__).resolve().parents[1] / "runs"
+
+def detect_root() -> Path:
+    """Route X+: 过程留痕写到工作区根，避免随 Skill 包分发出去。"""
+    env = os.environ.get("PM_WORKFLOW_RUNS")
+    if env:
+        return Path(env).expanduser().resolve()
+    cur = Path.cwd().resolve()
+    for p in (cur, *cur.parents):
+        if (p / ".git").exists():
+            return p
+    # 兜底：绝不落在 Skill 包内
+    return Path.home() / "pm-workflow-runs"
+
+RUNS = detect_root() / "runs"
 KG_INDEX = ROOT / "knowledge_graph" / "index.jsonl"
 FEEDBACK_DIR = ROOT / "feedback_log"
 EVOLUTION_DIR = ROOT / "evolution_log"

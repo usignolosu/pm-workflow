@@ -19,3 +19,11 @@ __pycache__/
 **/__pycache__/
 *.py[cod]
 *$py.class
+
+# 过程留痕目录（禁止入库）
+# 历史教训：runs/ 内存放真实需求的过程留痕，含内部路径、专有 KB、系统截图。
+# 曾被误提交进本公开仓库造成泄漏。Skill 本体是跨 agent 分发单元，
+# 不得承载任何过程数据；过程留痕应写入使用者的工作区根目录。
+runs/
+/workflow-runs/
+pm-workflow-runs/

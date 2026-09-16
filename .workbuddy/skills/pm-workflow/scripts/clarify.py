@@ -6,6 +6,7 @@ clarify.py — 需求澄清门 CLI（v5.0 精简版）
 模板填充 + 状态切换压缩成 _set_phase。
 """
 import argparse
+import os
 import json
 import re
 import sys
@@ -21,7 +22,20 @@ ROOT = Path(__file__).resolve().parents[4]  # B仓根: scripts→skill→skills�
 QUESTIONS_YAML = ROOT / "workflow" / "clarification_questions.yaml"
 TEMPLATE = ROOT / "templates" / "clarification.md"
 # Route X：活动需求目录改指 runs/<run-id>/（不再写根级 归档需求产出/），state.json 随 run 隔离
-RUNS = Path(__file__).resolve().parents[1] / "runs"
+
+def detect_root() -> Path:
+    """Route X+: 过程留痕写到工作区根，避免随 Skill 包分发出去。"""
+    env = os.environ.get("PM_WORKFLOW_RUNS")
+    if env:
+        return Path(env).expanduser().resolve()
+    cur = Path.cwd().resolve()
+    for p in (cur, *cur.parents):
+        if (p / ".git").exists():
+            return p
+    # 兜底：绝不落在 Skill 包内
+    return Path.home() / "pm-workflow-runs"
+
+RUNS = detect_root() / "runs"
 
 
 # ========== 工具 ==========

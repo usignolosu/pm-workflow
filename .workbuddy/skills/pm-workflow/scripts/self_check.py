@@ -22,6 +22,19 @@ import tempfile
 SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(SKILL_DIR, "scripts")
 
+
+def detect_root() -> Path:
+    """Route X+: 过程留痕写到工作区根，避免随 Skill 包分发出去。"""
+    env = os.environ.get("PM_WORKFLOW_RUNS")
+    if env:
+        return Path(env).expanduser().resolve()
+    cur = Path.cwd().resolve()
+    for p in (cur, *cur.parents):
+        if (p / ".git").exists():
+            return p
+    # 兜底：绝不落在 Skill 包内
+    return Path.home() / "pm-workflow-runs"
+
 FAILS = []
 
 
@@ -91,7 +104,7 @@ def main():
     check("gen_prototype 生成 index.html", os.path.exists(os.path.join(proto_out, "index.html")), r.stderr.strip())
 
     # 6) report_status（执行留痕）
-    run_dir = os.path.join(SKILL_DIR, "runs", "self-check")
+    run_dir = os.path.join(str(detect_root() / "runs"), "self-check")
     r = run("report_status.py", "--run", "self-check", "--agent", "测试",
             "--state", "done", "--doing", "功能自校验", "--output", "self_check", "--cost", "1s")
     log = os.path.join(run_dir, "execution-log.md")

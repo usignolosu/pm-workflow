@@ -4,8 +4,27 @@
 # 用法：./scripts/heartbeat.sh
 set -e
 
-# Route X：活动需求目录改指 runs/<run-id>/（不再读根级 state.json）
-RUNS_DIR="$(cd "$(dirname "$0")/../runs" && pwd)"
+# Route X+：过程留痕写到工作区根，避免随 Skill 包分发出去
+_pmw_detect_root() {
+  # 1) 环境变量显式覆盖
+  if [ -n "$PM_WORKFLOW_RUNS" ]; then
+    printf '%s' "$PM_WORKFLOW_RUNS"
+    return
+  fi
+  # 2) 从当前目录向上找 git 仓库根
+  _d="$(pwd)"
+  while [ "$_d" != "/" ]; do
+    if [ -d "$_d/.git" ]; then
+      printf '%s' "$_d"
+      return
+    fi
+    _d="$(dirname "$_d")"
+  done
+  # 3) 兜底：用户 HOME 下（绝不落在 Skill 包内）
+  printf '%s' "${HOME}/pm-workflow-runs"
+}
+RUNS_DIR="$(_pmw_detect_root)/runs"
+mkdir -p "$RUNS_DIR"
 
 echo "=== 💓 心跳自检 · 状态摘要 ==="
 echo "时间: $(date '+%Y-%m-%d %H:%M %A')"

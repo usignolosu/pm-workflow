@@ -16,8 +16,19 @@ import os
 import sys
 from datetime import datetime
 
-SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RUNS_DIR = os.path.join(SKILL_DIR, "runs")
+def detect_root() -> Path:
+    """Route X+: 过程留痕写到工作区根，避免随 Skill 包分发出去。"""
+    env = os.environ.get("PM_WORKFLOW_RUNS")
+    if env:
+        return Path(env).expanduser().resolve()
+    cur = Path.cwd().resolve()
+    for p in (cur, *cur.parents):
+        if (p / ".git").exists():
+            return p
+    # 兜底：绝不落在 Skill 包内
+    return Path.home() / "pm-workflow-runs"
+
+RUNS_DIR = str(detect_root() / "runs")
 
 
 def log_path(run_id: str) -> str:

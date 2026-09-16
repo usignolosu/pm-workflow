@@ -12,8 +12,27 @@
 set -e
 cd "$(dirname "$0")/.."
 
-# Route X：活动需求目录改指 runs/<run-id>/（不再写根级 归档需求产出/），state.json 随 run 隔离
-RUNS_DIR="$(pwd)/runs"
+# Route X+：过程留痕写到工作区根，避免随 Skill 包分发出去（消除 CWD 依赖）
+_pmw_detect_root() {
+  # 1) 环境变量显式覆盖
+  if [ -n "$PM_WORKFLOW_RUNS" ]; then
+    printf '%s' "$PM_WORKFLOW_RUNS"
+    return
+  fi
+  # 2) 从当前目录向上找 git 仓库根
+  _d="$(pwd)"
+  while [ "$_d" != "/" ]; do
+    if [ -d "$_d/.git" ]; then
+      printf '%s' "$_d"
+      return
+    fi
+    _d="$(dirname "$_d")"
+  done
+  # 3) 兜底：用户 HOME 下（绝不落在 Skill 包内）
+  printf '%s' "${HOME}/pm-workflow-runs"
+}
+RUNS_DIR="$(_pmw_detect_root)/runs"
+mkdir -p "$RUNS_DIR"
 
 # 解析 state.json 路径：优先 runs/<REQ_ID>/state.json；REQ_ID 缺失时扫描含该 bug 的 run
 resolve_state() {
