@@ -1,0 +1,11 @@
+_type: Guardrail
+id: g107
+name: 审计-缺陷带严重程度
+category: agent_specific
+agent: xingbu
+severity: P0
+check_pattern: "测试缺陷必须标 P0/P1/P2/P3，P0 未修复不得通过审核"
+source: workflow/_archive/contracts.v1.md#L89
+created: 2026-07-03
+status: active
+legal_values: [P0, P1, P2, P3]

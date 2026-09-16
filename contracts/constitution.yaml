@@ -1,0 +1,50 @@
+# 项目宪法（Constitution）—— 需求无关的产品原则红线
+# =========================================================================
+# v4.0 新增（借鉴 GitHub Spec Kit 的 constitution 概念）
+# 来源：workflow/lessons.md（示例REQ-B 实施的 9 条教训）+ 高频 Guardrail 归纳
+# 用法：
+#   - 所有 Agent Load Order 第 -1 步必读（见 contracts/schema/load_order.yaml#pre_load）
+#   - reviewer审核时逐条人工对照；机器部分由 validate_contract.py 加载并提示
+#   - 与具体 REQ 无关；REQ 级的校验规则见 guardrails.yaml
+# =========================================================================
+
+_version: "1.0.0"
+_source: workflow/lessons.md
+
+constitution:
+  - id: c001
+    principle: 数据必须带时效
+    detail: 任何展示给用户的数据（行情/统计/新闻）必须定义"更新时间"展示方式，用户能判断数据新旧。
+    origin: 教训 1（Guardrail g010）
+  - id: c002
+    principle: 外部依赖必须有完整降级链
+    detail: 依赖外部接口/数据源的功能至少定义 3 级降级（主源 → 备用源 → 离线兜底），且每级写明用户看到什么；非核心功能（新闻/搜索）同样要有降级。
+    origin: 教训 2、9（Guardrail g011）
+  - id: c003
+    principle: 计算逻辑必须覆盖边界
+    detail: 涉及计算/统计/回测的功能必须覆盖零输入、单值、整除边界、索引越界、时序末尾数据不完整。
+    origin: 教训 3（Guardrail g012）
+  - id: c004
+    principle: 原型、PRD、API 三方字段对齐
+    detail: 原型中出现的每个交互元素和数据字段，PRD 必须有对应功能说明与验收条件；不允许"原型有、PRD 无"。
+    origin: 教训 4（Guardrail g013）
+  - id: c005
+    principle: 批量操作必须声明并行策略
+    detail: 对多对象的批量拉取/处理，设计时明确并行/串行策略及超时预算，不允许默认串行拖垮页面。
+    origin: 教训 5（TDL-08）
+  - id: c006
+    principle: 运行时版本必须显式声明
+    detail: 技术方案必须声明目标运行时版本及语法兼容规则（如 Python 3.9 禁用 X | None 语法）。
+    origin: 教训 6（TDL-09）
+  - id: c007
+    principle: 模块依赖必须单向
+    detail: 技术方案的依赖图必须单向无环；跨模块共享逻辑走统一注入点。
+    origin: 教训 7（TDL-10）
+  - id: c008
+    principle: 持久化边界必须明确到字段
+    detail: 什么数据刷新后保留、什么清除，必须逐字段定义，不允许"部分数据丢失"这类模糊表述。
+    origin: 教训 8（Guardrail g009 加强）
+
+review_hint: |
+  reviewer在方案评审门与原型评审门时，对照以上 8 条逐条问：
+  "本需求的 PRD/原型是否覆盖 c00N？不适用则显式标注 N/A 及理由。"

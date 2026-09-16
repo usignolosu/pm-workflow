@@ -1,0 +1,31 @@
+{"_type":"Lesson","id":"lesson.001","name":"数据时间戳缺失","req_id":null,"tags":[],"path":"legacy/lessons.yaml"}
+{"_type":"Lesson","id":"lesson.002","name":"数据降级链路不完整，离线场景未定义","req_id":null,"tags":[],"path":"legacy/lessons.yaml"}
+{"_type":"Lesson","id":"lesson.003","name":"算法边界条件未定义","req_id":null,"tags":[],"path":"legacy/lessons.yaml"}
+{"_type":"Lesson","id":"lesson.004","name":"API 字段清单与原型展示字段不一致","req_id":null,"tags":[],"path":"legacy/lessons.yaml"}
+{"_type":"Lesson","id":"lesson.005","name":"批量调用性能未定义","req_id":null,"tags":[],"path":"legacy/lessons.yaml"}
+{"_type":"Lesson","id":"lesson.006","name":"运行时版本兼容性未声明","req_id":null,"tags":[],"path":"legacy/lessons.yaml"}
+{"_type":"Lesson","id":"lesson.007","name":"模块循环依赖未防护","req_id":null,"tags":[],"path":"legacy/lessons.yaml"}
+{"_type":"Lesson","id":"lesson.008","name":"数据持久化方案模糊","req_id":null,"tags":[],"path":"legacy/lessons.yaml"}
+{"_type":"Lesson","id":"lesson.009","name":"新闻情感评分的数据来源未定义降级","req_id":null,"tags":[],"path":"legacy/lessons.yaml"}
+{"_type":"Guardrail","id":"g002","name":"不得标 TBD","req_id":null,"tags":[],"path":"entities/guardrail/g002_no_tbd.yaml"}
+{"_type":"Guardrail","id":"g013","name":"原型-实施对齐契约","req_id":null,"tags":[],"path":"entities/guardrail/g013_prd_alignment.yaml"}
+{"_type":"Guardrail","id":"g104","name":"合规-必须三选一","req_id":null,"tags":[],"path":"entities/guardrail/g104_compliance_decision.yaml"}
+{"_type":"Guardrail","id":"g106","name":"原型-A2-P0 流程必覆盖","req_id":null,"tags":[],"path":"entities/guardrail/g106_gongbu_p0_coverage.yaml"}
+{"_type":"Guardrail","id":"g005","name":"不得跳级传递","req_id":null,"tags":[],"path":"entities/guardrail/g005_no_skip.yaml"}
+{"_type":"Guardrail","id":"g108","name":"评审组-判据引原文","req_id":null,"tags":[],"path":"entities/guardrail/g108_menxia_evidence.yaml"}
+{"_type":"Guardrail","id":"g001","name":"不得捏造事实","req_id":null,"tags":[],"path":"entities/guardrail/g001_no_fabrication.yaml"}
+{"_type":"Guardrail","id":"g011","name":"数据降级链路必写","req_id":null,"tags":[],"path":"entities/guardrail/g011_degradation_required.yaml"}
+{"_type":"Guardrail","id":"g012","name":"算法边界条件必写","req_id":null,"tags":[],"path":"entities/guardrail/g012_algorithm_boundary.yaml"}
+{"_type":"Guardrail","id":"g014","name":"知识图谱引用必填","req_id":null,"tags":[],"path":"entities/guardrail/g014_kg_refs_required.yaml"}
+{"_type":"Guardrail","id":"g003","name":"不得写空话","req_id":null,"tags":[],"path":"entities/guardrail/g003_no_empty_words.yaml"}
+{"_type":"Guardrail","id":"g103","name":"指标-验收标准可量化","req_id":null,"tags":[],"path":"entities/guardrail/g103_hubu_quantifiable.yaml"}
+{"_type":"Guardrail","id":"g010","name":"数据时间戳必填","req_id":null,"tags":[],"path":"entities/guardrail/g010_timestamp_required.yaml"}
+{"_type":"Guardrail","id":"g101","name":"用户研究-画像来源标注","req_id":null,"tags":[],"path":"entities/guardrail/g101_libu_source.yaml"}
+{"_type":"Guardrail","id":"g107","name":"审计-缺陷带严重程度","req_id":null,"tags":[],"path":"entities/guardrail/g107_xingbu_severity.yaml"}
+{"_type":"Guardrail","id":"g105","name":"原型-A1-许可证必标","req_id":null,"tags":[],"path":"entities/guardrail/g105_gongbu_license.yaml"}
+{"_type":"Guardrail","id":"g008","name":"边界条件必填","req_id":null,"tags":[],"path":"entities/guardrail/g008_boundary_required.yaml"}
+{"_type":"Guardrail","id":"g004","name":"不得使用\"等\"字收尾","req_id":null,"tags":[],"path":"entities/guardrail/g004_no_etc_trail.yaml"}
+{"_type":"Guardrail","id":"g006","name":"编号一致性","req_id":null,"tags":[],"path":"entities/guardrail/g006_number_consistency.yaml"}
+{"_type":"Guardrail","id":"g007","name":"无反问句","req_id":null,"tags":[],"path":"entities/guardrail/g007_no_question.yaml"}
+{"_type":"Guardrail","id":"g102","name":"战略-功能编号全局唯一","req_id":null,"tags":[],"path":"entities/guardrail/g102_bingbu_fr_unique.yaml"}
+{"_type":"Guardrail","id":"g009","name":"持久化方案必填","req_id":null,"tags":[],"path":"entities/guardrail/g009_persistence_required.yaml"}

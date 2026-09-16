@@ -1,0 +1,11 @@
+_type: Guardrail
+id: g104
+name: 合规-必须三选一
+category: agent_specific
+agent: libu_compliance
+severity: P0
+check_pattern: "每项合规检查必须给出三选一明确结论"
+source: workflow/_archive/contracts.v1.md#L86
+created: 2026-07-03
+status: active
+legal_values: [PASS, NEEDS_REVIEW, BLOCK]

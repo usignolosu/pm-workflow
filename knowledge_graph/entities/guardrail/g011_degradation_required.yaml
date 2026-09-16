@@ -1,0 +1,13 @@
+_type: Guardrail
+id: g011
+name: 数据降级链路必写
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: |
+  至少 3 级：主数据源 → 备用源 → 离线模拟池 → 不可用提示
+  每级说明用户看到什么
+source: workflow/_archive/contracts.v1.md#L75
+created: 2026-07-03
+status: active
+derived_from: lesson.002

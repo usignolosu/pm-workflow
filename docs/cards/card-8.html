@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#F5F6FA;--card:#FFF;--line:#E5E7EB;--t1:#111827;--t2:#6B7280;--t3:#9CA3AF;--pri:#2563EB;--pri-h:#3B82F6;--pri-bg:#EFF6FF;--ok:#22C55E;--ok-bg:#F0FDF4;--warn:#F59E0B;--warn-bg:#FFFBEB;--danger:#EF4444;--danger-bg:#FEF2F2;--purple:#8B5CF6;--pink:#EC4899;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-pill:9999px}
+html,body{background:#E5E7EB;color:var(--t1);font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+body{padding:0;margin:0;display:flex;justify-content:center;align-items:flex-start}
+.deck{display:flex;flex-direction:column;align-items:center;gap:0;padding:0}
+.card{width:750px !important;height:auto !important;min-height:0 !important;max-height:none !important;overflow:visible !important;background:var(--card);border-radius:var(--r-lg);box-shadow:0 10px 30px rgba(0,0,0,.08);padding:36px 40px;display:flex;flex-direction:column;margin:24px auto;position:relative}
+.num{position:absolute;top:20px;right:24px;font-size:11px;color:var(--t3);font-weight:600;letter-spacing:1px}
+.brand{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.brand .logo{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#2563EB,#8B5CF6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.brand .name{font-size:13px;font-weight:600}
+.brand .tag{font-size:10px;background:#F3F4F6;color:var(--t2);padding:2px 7px;border-radius:var(--r-pill)}
+.title{margin-bottom:8px}
+.title h1{font-size:32px;font-weight:700;line-height:1.2;letter-spacing:-.5px;margin-bottom:6px}
+.title h1 .em{color:var(--pri)}
+.title p{font-size:13px;color:var(--t2);line-height:1.6}
+.feature{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+.feature:last-child{border-bottom:0}
+.feature .icon{width:36px;height:36px;border-radius:var(--r-sm);background:var(--pri-bg);color:var(--pri);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.feature .info{flex:1;min-width:0}
+.feature .name{font-size:14px;font-weight:600;margin-bottom:2px}
+.feature .desc{font-size:12px;color:var(--t2);line-height:1.55}
+.feature .desc code{font-family:ui-monospace,Menlo,monospace;background:#F3F4F6;padding:1px 5px;border-radius:3px;font-size:11px;color:var(--pri)}
+.cmd{display:block;background:#F9FAFB;border-radius:var(--r-sm);padding:10px 14px;margin-top:10px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.7;color:var(--t1)}
+.cmd .cm{color:var(--t3)}
+.kpi{display:flex;gap:8px;margin-top:10px}
+.kpi .item{flex:1;background:#F9FAFB;border-radius:var(--r-sm);padding:8px;text-align:center;border:1px solid var(--line)}
+.kpi .v{font-size:18px;font-weight:700;color:var(--pri);font-family:ui-monospace,Menlo,monospace}
+.kpi .l{font-size:10px;color:var(--t2);margin-top:2px}
+.footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.footer .credit{font-size:10px;color:var(--t3)}
+.footer .next{font-size:11px;color:var(--pri);font-weight:600}
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="card" id="card-8">
+  <div class="num">08 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">v7.0.0</span>
+  </div>
+  <div class="title">
+    <h1>让 PRD 流水线<br><span class="em">像 自来水</span><br>一样跑起来</h1>
+    <p>提需求 → 澄清 → 调研 → 场景 → 功能表 → 原型 → PRD → QA → 归档，全程 60 分钟一次跑通。</p>
+  </div>
+
+  <div class="feature">
+    <div class="icon">📝</div>
+    <div class="info">
+      <div class="name">一句话开局</div>
+      <div class="desc">PM 在 WorkBuddy 会话里说一句话，<code>主编排</code> 立即判定规模（lightweight / standard / complex）和 <code>deliver_code</code> 开关。</div>
+    </div>
+  </div>
+  <div class="feature">
+    <div class="icon">🤖</div>
+    <div class="info">
+      <div class="name">13 角色串场</div>
+      <div class="desc">会话内由 agent 内扮演多个角色（无独立进程），按单循环 8 阶段产出：澄清 → 调研 → 用例 → 场景 → 功能表 → 低保真 → 高保真+PRD → QA。</div>
+    </div>
+  </div>
+  <div class="feature">
+    <div class="icon">🛡️</div>
+    <div class="info">
+      <div class="name">20 + 4 防线</div>
+      <div class="desc">20 条 guardrail（<code>g001</code>/<code>g014</code> 等）+ 4 道人工门 + 项目宪法 8 条 + 知识图谱反例防模板污染。</div>
+    </div>
+  </div>
+  <div class="feature">
+    <div class="icon">📦</div>
+    <div class="info">
+      <div class="name">双份归档</div>
+      <div class="desc"><code>runs/&lt;run-id&gt;/</code> 执行流（含 execution-log.md）+ <code>&lt;需求名&gt;需求产出/</code> 长期归口（含中文名映射）。</div>
+    </div>
+  </div>
+
+  <div class="cmd">$ open <span style="color:var(--ok)">$HOME/Documents/workbuddy/工作流-产品/.workbuddy/skills/产品自动化工作流/SKILL.md</span>
+<span class="cm"># 加载 v7.0.0 Skill 全文，开始你的下一个需求</span></div>
+
+  <div class="kpi">
+    <div class="item"><div class="v">3</div><div class="l">规模</div></div>
+    <div class="item"><div class="v">4</div><div class="l">人工门</div></div>
+    <div class="item"><div class="v">20</div><div class="l">Guardrail</div></div>
+    <div class="item"><div class="v">128</div><div class="l">KG 实体</div></div>
+  </div>
+
+  <div class="footer">
+    <span class="credit">v7.0.0 · Skill 形态 · 与 WorkBuddy 项目级绑定 · 合并定稿 2026-09-16</span>
+    <span class="next">— END</span>
+  </div>
+</div>
+</div>
+</body>
+</html>

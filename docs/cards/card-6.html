@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#F5F6FA;--card:#FFF;--line:#E5E7EB;--t1:#111827;--t2:#6B7280;--t3:#9CA3AF;--pri:#2563EB;--pri-h:#3B82F6;--pri-bg:#EFF6FF;--ok:#22C55E;--ok-bg:#F0FDF4;--warn:#F59E0B;--warn-bg:#FFFBEB;--danger:#EF4444;--danger-bg:#FEF2F2;--purple:#8B5CF6;--pink:#EC4899;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-pill:9999px}
+html,body{background:#E5E7EB;color:var(--t1);font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+body{padding:0;margin:0;display:flex;justify-content:center;align-items:flex-start}
+.deck{display:flex;flex-direction:column;align-items:center;gap:0;padding:0}
+.card{width:750px !important;height:auto !important;min-height:0 !important;max-height:none !important;overflow:visible !important;background:var(--card);border-radius:var(--r-lg);box-shadow:0 10px 30px rgba(0,0,0,.08);padding:36px 40px;display:flex;flex-direction:column;margin:24px auto;position:relative}
+.num{position:absolute;top:20px;right:24px;font-size:11px;color:var(--t3);font-weight:600;letter-spacing:1px}
+.brand{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.brand .logo{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#2563EB,#8B5CF6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.brand .name{font-size:13px;font-weight:600}
+.brand .tag{font-size:10px;background:#F3F4F6;color:var(--t2);padding:2px 7px;border-radius:var(--r-pill)}
+.title{margin-bottom:8px}
+.title h1{font-size:32px;font-weight:700;line-height:1.2;letter-spacing:-.5px;margin-bottom:6px}
+.title h1 .em{color:var(--pri)}
+.title p{font-size:13px;color:var(--t2);line-height:1.6}
+.layer{display:flex;align-items:stretch;gap:0;margin:10px 0;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--line)}
+.layer .name{flex:0 0 130px;padding:10px 12px;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.layer .body{flex:1;padding:10px 14px;font-size:12px;line-height:1.6}
+.layer .body b{color:var(--t1)}
+.layer .body code{font-family:ui-monospace,Menlo,monospace;background:#F3F4F6;padding:1px 5px;border-radius:3px;font-size:11px;color:var(--pri)}
+.example{margin-top:10px;padding:12px 14px;background:#FEF2F2;border-left:3px solid var(--danger);border-radius:0 var(--r-sm) var(--r-sm) 0}
+.example h4{font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.example pre{font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.6;color:var(--t1);white-space:pre-wrap}
+.footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.footer .credit{font-size:10px;color:var(--t3)}
+.footer .next{font-size:11px;color:var(--pri);font-weight:600}
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="card" id="card-6">
+  <div class="num">06 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">v7.0.0</span>
+  </div>
+  <div class="title"><h1>怎么保证 <span class="em">不垃圾</span>？</h1><p>3 层防线 · 机器 + 流程 + 共识</p></div>
+
+  <div class="layer"><div class="name" style="background:var(--pri)">机器防线</div><div class="body"><b>20 条 guardrail</b> + spec 质量门。<code>validate_contract.py</code> 自动跑，P0 即 fail 阻塞归档。</div></div>
+  <div class="layer"><div class="name" style="background:var(--purple)">流程防线</div><div class="body"><b>4 人工门</b> 强制评审 + 评审 critic 中途独立打回 + QA 终审 + 来源标注。</div></div>
+  <div class="layer"><div class="name" style="background:var(--ok)">共识防线</div><div class="body"><b>宪法 8 条</b>（不捏造/不确定处显式/EARS/引用不悬空/术语消歧/口径一致/降级链/边界条件）+ KG 反例防模板污染。</div></div>
+
+  <div class="example">
+    <h4>实战：<code>g001</code> 在示例需求抓到 13 处裸百分比</h4>
+    <pre>❌ 持久化率 **100%**
+✓ 持久化率 **100%**（来源：本需求目标值；现状基线 0%）
+
+❌ 佣金万 2.5、滑点 0.1%
+✓ 佣金万 2.5、滑点 0.1%（费率来源：基于 A 股现行公开交易规则的调研）</pre>
+  </div>
+
+  <div style="margin-top:10px;padding:10px 12px;background:var(--ok-bg);border-radius:8px;font-size:12px;color:var(--t1);line-height:1.6">
+    <b>实测：</b>demo-20260101 一次跑通，契约校验 <b style="color:var(--ok)">20/20 PASS</b>（收敛过程 16/4 → 18/2 → 20/0）。
+  </div>
+
+  <div class="footer">
+    <span class="credit">v7.0.0 防线体系 · 实战验证</span>
+    <span class="next">→ 下一张：你只在 4 个门上</span>
+  </div>
+</div>
+</div>
+</body>
+</html>

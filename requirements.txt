@@ -1,0 +1,7 @@
+# 产品自动化工作流 · Python 依赖
+# 示例仓库（姊妹工作流仓库）脚本迁来时缺依赖声明，系统 python 直接跑会报
+#   ERROR: 需要安装 PyYAML
+# 用受管 venv 安装：
+#   $HOME/.workbuddy/binaries/python/versions/3.13.12/bin/python3 -m venv <venv>
+#   <venv>/bin/pip install -r requirements.txt
+PyYAML>=6.0

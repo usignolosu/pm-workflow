@@ -1,0 +1,161 @@
+# 需求澄清门契约（Clarification Gate Contract）
+# =========================================================================
+# v3.1 新增契约：定义澄清门的触发规则、维度、响应格式、状态字段、超时。
+# 与 contracts/schema/kg_contract.yaml 风格一致。
+# =========================================================================
+
+_version: "1.0.0"
+_description: |
+  本契约为 v3.1 新增。
+  定义 INIT → CLARIFYING → DRAFTING 之间的澄清门规则。
+
+# -----------------------------------------------------------------------------
+# 状态字段定义
+# -----------------------------------------------------------------------------
+state_fields:
+  clarification_pending:
+    type: enum
+    values: [null, "clarification"]
+    default: null
+    description: "当前是否在澄清门"
+    set_when:
+      "clarification": "进入澄清门，supervisor已生成问题清单，等 PM 回答"
+      null: "未进澄清门 / 已答完退出"
+  clarification_skipped:
+    type: enum
+    values: [false, true, "timeout"]
+    default: false
+    description: "澄清门是否被跳过"
+    set_when:
+      true: "PM 主动说'跳过澄清'"
+      timeout: "30 分钟无响应自动跳过"
+      false: "正常完成 5 维度回答"
+  clarification_mode:
+    type: enum
+    values: [off, "manual-trigger", "scale-dependent"]
+    default: "scale-dependent"
+    description: "澄清门触发模式"
+    set_when:
+      off: "PM 强制关闭（应急用）"
+      manual-trigger: "PM 说'开启澄清门'才启用"
+      scale-dependent: "按 scale 自动启用（complex 开、standard 可选、light 关）"
+
+# -----------------------------------------------------------------------------
+# 触发规则
+# -----------------------------------------------------------------------------
+trigger_rules:
+  light:
+    default: false   # 默认跳过
+    enable_by:
+      - "PM 说'开启澄清门' / '本次要澄清'"
+  standard:
+    default: false   # 默认跳过
+    enable_by:
+      - "PM 说'开启澄清门' / '本次要澄清'"
+  complex:
+    default: true    # 默认开
+    disable_by:
+      - "PM 说'跳过澄清' / '本次不要澄清'"
+
+# -----------------------------------------------------------------------------
+# 5 维度定义（引用 workflow/clarification_questions.yaml）
+# -----------------------------------------------------------------------------
+dimensions:
+  ref: workflow/clarification_questions.yaml#dimensions
+  required_count: 5
+  partial_answer_allowed: true   # PM 可以只答部分，其他用 default
+  skip_all_allowed: true         # PM 可以"跳过澄清"全跳过
+
+# -----------------------------------------------------------------------------
+# PM 响应格式
+# -----------------------------------------------------------------------------
+pm_response:
+  answer_per_dimension:
+    command_pattern: "回答 [序号]：[维度] = [答复]"
+    example: "回答 1：背景 = 公司内部文档分散在 5 个系统..."
+  answer_all_at_once:
+    command_pattern: |
+      1. 背景：[答复]
+      2. 核心问题：[答复]
+      3. 预期范围：[答复]
+      4. 场景：[答复]
+      5. 用户：[答复]
+  submit:
+    command: "✅ 答完了" | "继续" | "提交"
+    effect:
+      - "clarification_pending = null"
+      - "clarification_skipped = false"
+      - "进入 DRAFTING"
+  skip:
+    command: "跳过澄清"
+    effect:
+      - "clarification_pending = null"
+      - "clarification_skipped = true"
+      - "进入 DRAFTING（用 default 值）"
+  redo:
+    command: "清单再看一下"
+    effect: "重新展示 5 维度问题清单（不修改 state）"
+
+# -----------------------------------------------------------------------------
+# 超时规则
+# -----------------------------------------------------------------------------
+timeout:
+  default_minutes: 30
+  scale_adjustments:
+    light: 10
+    standard: 30
+    complex: 60
+  on_timeout:
+    action: "auto_skip"
+    set_fields:
+      clarification_skipped: "timeout"
+      clarification_pending: null
+    log_to: "feedback_log/clarification/timeout_${req_id}_${date}.md"
+  timer_start: "clarification_pending 设为 'clarification' 时"
+  timer_reset: "PM 任何回答都重置 30 分钟"
+
+# -----------------------------------------------------------------------------
+# 产出文件路径
+# -----------------------------------------------------------------------------
+output:
+  file: "归档需求产出/${req_id}/01_drafted/01_clarifications.md"
+  template: "templates/clarification.md"
+  template_substitution:
+    - "REQ-XXX → ${req_id}"
+    - "触发时间 → YYYY-MM-DD HH:MM（实际触发时刻）"
+
+# -----------------------------------------------------------------------------
+# 与其他阶段的关系
+# -----------------------------------------------------------------------------
+relationships:
+  before: "INIT（supervisor已建档）"
+  after: "DRAFTING（Specialists起草）"
+  with_pm_check_b_mode: |
+    澄清门在 DRAFTING 之前，B 模式 PM-Check 在 DRAFTING 中途。两者不替代。
+    PM 在澄清门答"用户" → 用户研究画像数量确定；
+    PM 在 B 模式 PM-Check 1 校用户研究画像 → 验证用户研究理解是否对齐。
+  with_strategy_gate: |
+    战略门在 INIT 之前（complex 专属），问"是否要拆多个 REQ"。
+    澄清门在 INIT 之后，问"5 维度需求内容"。
+    战略门过 → INIT → 澄清门 → DRAFTING。
+
+# -----------------------------------------------------------------------------
+# 校验器规则
+# -----------------------------------------------------------------------------
+validator:
+  rule_id: clarification_format
+  description: "校验 01_clarifications.md 格式"
+  applies_to_agents: [shangshu]
+  applies_when: "scale ∈ [standard, complex] AND clarification_skipped = false"
+  checks:
+    - "5 个 ## 标题必须存在（## 1. 背景 等）"
+    - "每个 ## 段必须有'PM 答复：'字样"
+    - "空答复视为未完成 → fail"
+
+# -----------------------------------------------------------------------------
+# 历史 REQ 豁免
+# -----------------------------------------------------------------------------
+legacy_waivers:
+  applies_to_req_ids: [REQ-001, REQ-002, 示例REQ-A, 示例REQ-B]
+  default_clarification_skipped: true
+  note: "历史 REQ 在澄清门引入前完成，校验器自动豁免 clarification_format"

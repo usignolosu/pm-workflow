@@ -1,0 +1,10 @@
+_type: Guardrail
+id: g102
+name: 战略-功能编号全局唯一
+category: agent_specific
+agent: bingbu
+severity: P0
+check_pattern: "FR #编号 在同一 REQ 内全局唯一"
+source: workflow/_archive/contracts.v1.md#L84
+created: 2026-07-03
+status: active

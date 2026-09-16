@@ -1,0 +1,123 @@
+# 契约版本管理规范
+# =========================================================================
+# 此文件定义 contracts/ 目录的版本号、变更日志、文件命名约定
+# =========================================================================
+
+_version: "2.0.0"
+_last_updated: 2026-07-03
+_owner: supervisor
+
+# -----------------------------------------------------------------------------
+# 版本号策略（Semantic Versioning）
+# -----------------------------------------------------------------------------
+semver_policy: |
+  MAJOR (X.0.0): 破坏性变化
+    - Guardrail 编号重排或语义修改
+    - 必备字段新增（导致历史 REQ 不通过校验）
+    - Agent 契约重命名
+
+  MINOR (x.Y.0): 向后兼容的新增
+    - 新增 Guardrail（仅追加，不修改已有）
+    - 新增 Agent 或角色
+    - 新增 PRD 章节（可选章节）
+    - 新增实体类型（知识图谱）
+
+  PATCH (x.y.Z): 文档/示例调整
+    - 文案润色、错别字修正
+    - 示例补充
+    - 注释完善
+
+# -----------------------------------------------------------------------------
+# 变更日志（按版本倒序）
+# -----------------------------------------------------------------------------
+_changelog:
+  - version: "2.0.0"
+    date: 2026-07-03
+    changes: |
+      从 workflow/contracts.md (Markdown, 364行) 拆分为 8 个 YAML + README
+      新增 schema/kg_contract.yaml（知识图谱契约）
+      新增 schema/validation_rules.yaml（机器可读校验规则）
+      新增 Guardrail #14（知识图谱引用必填）
+      引入模板变量 ${req_id}/${scale}/${industry}/${category}
+      引入 legacy_waivers 机制（历史 REQ 豁免）
+      删除原 §4（重复 Load Order）
+      删除原 §16（重复 PRD 章节）
+    migrated_from: workflow/contracts.md
+    archive_path: workflow/_archive/contracts.v1.md
+
+  - version: "1.0.0"
+    date: 2026-06-16
+    changes: 初始版本（Markdown 单一文件）
+
+# -----------------------------------------------------------------------------
+# 文件命名约定
+# -----------------------------------------------------------------------------
+file_naming:
+  agent_skill: "agents/{category}/{slug}/SKILL.md"
+  agent_identity: "agents/{category}/{slug}/IDENTITY.md"
+  agent_heartbeat: "agents/{category}/{slug}/HEARTBEAT.md"
+  contract_schema: "contracts/schema/{topic}.yaml"
+  prd_template: "contracts/prd_template/{variant}.yaml"
+  kg_entity: "knowledge_graph/{scope}/{req_id}/{type}.yaml"
+  kg_relation: "knowledge_graph/{scope}/{req_id}/relations.yaml"
+  script: "scripts/{name}.{py|sh}"
+
+# -----------------------------------------------------------------------------
+# 模板变量（供校验器和 Agent 调度时替换）
+# -----------------------------------------------------------------------------
+template_variables:
+  req_id:
+    pattern: "^REQ-\\d{3}$"
+    example: "REQ-005"
+  scale:
+    values: [light, standard, complex]
+    default: standard
+  industry:
+    values: [金融, 医疗, 教育, 跨境, 通用, 其他]
+    default: 通用
+  category:
+    values: [frontend, backend, mobile, data, infra]
+    default: backend
+  agent:
+    values: [libu, bingbu, hubu, libu_compliance, xingbu, gongbu, menxia, shangshu]
+
+# -----------------------------------------------------------------------------
+# 历史 REQ 豁免机制（legacy_waivers）
+# -----------------------------------------------------------------------------
+legacy_waivers:
+  description: |
+    历史 REQ（v1.0 时代产出）未带 kg_refs 等 v2.0 新字段。
+    校验器对历史 REQ 跳过 v2.0 新增的强制项，避免全量 fail。
+  applies_to_req_ids:
+    - REQ-001
+    - REQ-002
+    - 示例REQ-A
+    - 示例REQ-B
+  waived_rules:
+    - g014  # 知识图谱引用必填
+  future_waiver_removal: |
+    当 PM 决定"所有历史 REQ 必须补 kg_refs"时，逐个 REQ 跑
+    `python3 scripts/ingest_to_kg.py --req REQ-XXX`（semi-auto 模式）补齐实体，
+    并在产物文档补 kg_refs 字段后移除 waiver。
+    移除前需 PM 在反馈日志中确认。
+
+# -----------------------------------------------------------------------------
+# 校验器严格度等级（strictness）
+# -----------------------------------------------------------------------------
+strictness_levels:
+  off:
+    description: 仅 WARN，不 fail（PM 调研阶段）
+    default_for: legacy REQ
+    fail_threshold: []
+  warn:
+    description: P0 违规 WARN，P1/P2 fail（试运行阶段）
+    default_for: 新 REQ 试运行 1 周
+    fail_threshold: [P1, P2]
+  strict:
+    description: P0/P1 fail，P2 WARN（生产阶段）
+    default_for: 新 REQ 生产
+    fail_threshold: [P0, P1]
+
+  default_strictness: off
+  promotion_timeline: |
+    off (默认) → 1 周观察 → warn (试运行) → 1 月观察 → strict (生产)

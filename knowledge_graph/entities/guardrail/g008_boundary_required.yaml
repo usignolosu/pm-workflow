@@ -1,0 +1,10 @@
+_type: Guardrail
+id: g008
+name: 边界条件必填
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "每个功能必含'边界条件'和'离线/错误兜底策略'子节"
+source: workflow/_archive/contracts.v1.md#L72
+created: 2026-07-03
+status: active

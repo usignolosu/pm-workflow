@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>产品自动化工作流 · v7.0.0 移动端卡片版</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#F5F6FA; --card:#FFF; --line:#E5E7EB;
+    --t1:#111827; --t2:#6B7280; --t3:#9CA3AF;
+    --pri:#2563EB; --pri-h:#3B82F6; --pri-bg:#EFF6FF;
+    --ok:#22C55E; --ok-bg:#F0FDF4;
+    --warn:#F59E0B; --warn-bg:#FFFBEB;
+    --danger:#EF4444; --danger-bg:#FEF2F2;
+    --purple:#8B5CF6; --pink:#EC4899;
+    --r-sm:8px; --r-md:12px; --r-lg:16px; --r-pill:9999px;
+  }
+  html,body{background:#E5E7EB;color:var(--t1);font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+  body{padding:24px 0}
+  .deck{display:flex;flex-direction:column;align-items:center;gap:18px;padding:0 12px}
+  .card{
+    width:750px;
+    height:1000px;
+    background:var(--card);
+    border-radius:var(--r-lg);
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    padding:36px 40px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    position:relative;
+  }
+  .num{position:absolute;top:20px;right:24px;font-size:11px;color:var(--t3);font-weight:600;letter-spacing:1px}
+  .brand{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+  .brand .logo{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#2563EB,#8B5CF6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+  .brand .name{font-size:13px;font-weight:600}
+  .brand .tag{font-size:10px;background:#F3F4F6;color:var(--t2);padding:2px 7px;border-radius:var(--r-pill)}
+  .title{margin-bottom:8px}
+  .title h1{font-size:32px;font-weight:700;line-height:1.2;letter-spacing:-.5px;margin-bottom:6px}
+  .title h1 .em{color:var(--pri)}
+  .title p{font-size:13px;color:var(--t2);line-height:1.6}
+  .pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:var(--r-pill);margin-right:4px;margin-top:6px}
+  .b-pri{background:var(--pri-bg);color:var(--pri)}
+  .b-warn{background:var(--warn-bg);color:#92400E}
+  .b-ok{background:var(--ok-bg);color:var(--ok)}
+  .b-purple{background:#EDE9FE;color:#5B21B6}
+  .b-pink{background:#FCE7F3;color:#9D174D}
+  .lane{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+  .stage{background:#F9FAFB;border:1px solid var(--line);border-radius:var(--r-md);padding:9px 11px;text-align:center;min-width:88px;flex:1 1 88px}
+  .stage b{display:block;font-size:12.5px;font-weight:600}
+  .stage small{color:var(--t2);font-size:10px;display:block;margin-top:1px}
+  .stage.gate{background:#FFFBEB;border:2px solid var(--warn)}
+  .stage.gate b{color:#92400E}
+  .stage.done{background:#F0FDF4;border:1px solid var(--ok)}
+  .stage.done b{color:var(--ok)}
+  .stage.skip{background:#FAFAFA;border:1px dashed var(--t3);opacity:.55}
+  .stage.skip b{color:var(--t3)}
+  .stage.auto{background:var(--pri-bg);border-color:var(--pri-h)}
+  .arrow{color:var(--t3);font-size:14px;flex:0 0 auto}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border-bottom:1px solid var(--line);padding:9px 6px;text-align:left;vertical-align:top}
+  th{color:var(--t2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  tr:last-child td{border-bottom:0}
+  td.c{text-align:center}
+  .role{display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .role:last-child{border-bottom:0}
+  .avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px;flex-shrink:0}
+  .role .info{flex:1;min-width:0}
+  .role .name{font-size:15px;font-weight:600;margin-bottom:1px}
+  .role .what{font-size:12px;color:var(--t2);margin-bottom:3px}
+  .role .when{font-size:10px;color:var(--t3);font-family:ui-monospace,Menlo,monospace}
+  .line{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px}
+  .line:last-child{border-bottom:0}
+  .line .k{font-family:ui-monospace,Menlo,monospace;color:var(--pri);font-weight:600;flex-shrink:0;margin-right:10px;min-width:90px}
+  .line .v{color:var(--t2);flex:1}
+  .cmd{display:flex;justify-content:space-between;align-items:center;background:#F9FAFB;border-radius:var(--r-sm);padding:8px 12px;margin-bottom:6px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+  .cmd .l{flex:1}
+  .cmd .d{font-size:10px;color:var(--t2);font-family:-apple-system,sans-serif;flex-shrink:0;margin-left:8px}
+  .matrix{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+  .matrix th,.matrix td{border:1px solid var(--line);padding:5px 4px;text-align:center;vertical-align:middle}
+  .matrix th{background:#F3F4F6;font-size:10px;font-weight:600}
+  .matrix td.r{text-align:left;font-weight:600;background:#F9FAFB}
+  .on{background:#EFF6FF;color:#1E40AF;font-weight:600}
+  .g{background:#FFFBEB;color:#92400E;font-weight:600}
+  .off{color:#D1D5DB}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0}
+  .box{background:#F9FAFB;border-radius:var(--r-md);padding:14px;border:1px solid var(--line)}
+  .box h3{font-size:13px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .box p{font-size:12px;color:var(--t2);line-height:1.6}
+  .callout{background:linear-gradient(135deg,#EFF6FF,#EDE9FE);border-radius:var(--r-md);padding:14px 18px;margin:10px 0;font-size:13px;line-height:1.6}
+  .footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .footer .credit{font-size:10px;color:var(--t3)}
+  .footer .next{font-size:11px;color:var(--pri);font-weight:600}
+  h1.card-h{font-size:24px;font-weight:700;margin:14px 0 4px;line-height:1.25}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ========== Card 1: 封面 ========== -->
+<div class="card" id="card-1">
+  <div class="num">01 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">v7.0.0</span>
+  </div>
+  <div class="title" style="margin-top:auto">
+    <h1>把 PRD 流水线<br>交给一支<br><span class="em">AI 专家组</span>来跑</h1>
+    <p>主编排 + 13 角色 + QA 终审<br>需求一句话，全套产出</p>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <span class="pill b-pri">13+3 角色</span>
+    <span class="pill b-warn">≤4 人工门</span>
+    <span class="pill b-purple">20 防线</span>
+  </div>
+  <div class="footer">
+    <span class="credit">v7.0.0 合并定稿</span>
+    <span class="next">→ 1 分钟看完 8 张</span>
+  </div>
+</div>
+
+<!-- ========== Card 2: 8 阶段单循环 ========== -->
+<div class="card" id="card-2">
+  <div class="num">02 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">主流程</span>
+  </div>
+  <h1 class="card-h">一条 <span class="em">8 阶段</span> 单循环</h1>
+  <p style="font-size:12px;color:var(--t2);margin-bottom:10px">3 规模只决定哪些站跳过/加深，<b>流程本身不变</b></p>
+
+  <div class="lane">
+    <div class="stage done"><b>① 澄清</b><small>背景/角色/边界</small></div>
+    <div class="arrow">→</div>
+    <div class="stage"><b>② 调研</b><small>代码走查+KG</small></div>
+    <div class="arrow">→</div>
+    <div class="stage"><b>③ 用例</b><small>竞品+转写</small></div>
+  </div>
+  <div class="lane">
+    <div class="stage"><b>④ 场景</b><small>画像+旅程图</small></div>
+    <div class="arrow">→</div>
+    <div class="stage gate"><b>门 1</b><small>场景/旅程</small></div>
+    <div class="arrow">→</div>
+    <div class="stage"><b>⑤ 功能</b><small>RICE+指标+合规</small></div>
+    <div class="arrow">→</div>
+    <div class="stage gate"><b>门 2</b><small>方案评审</small></div>
+  </div>
+  <div class="lane">
+    <div class="stage"><b>⑥ 低保真</b></div>
+    <div class="arrow">→</div>
+    <div class="stage gate"><b>门 3</b></div>
+    <div class="arrow">→</div>
+    <div class="stage"><b>⑦ PRD+高保真</b></div>
+    <div class="arrow">→</div>
+    <div class="stage auto"><b>机器门</b><small>20 防线</small></div>
+  </div>
+  <div class="lane" style="justify-content:center">
+    <div class="stage done"><b>⑧ QA</b><small>终审+来源</small></div>
+    <div class="arrow">→</div>
+    <div class="stage gate"><b>门 4</b><small>交付验收</small></div>
+    <div class="arrow">→</div>
+    <div class="stage done" style="min-width:120px"><b>归档</b><small>需求产出/</small></div>
+  </div>
+
+  <div class="callout">🟧 门 1-4 = 等 PM 拍板（≤4 次打断）<br>🔵 机器门 = 自动跑，不占打断次数</div>
+
+  <div class="footer">
+    <span class="credit">v5.1 的 24 状态机 → v7.0.0 单循环</span>
+    <span class="next">→ 选哪个规模</span>
+  </div>
+</div>
+
+<!-- ========== Card 3: 3 规模 × deliver_code ========== -->
+<div class="card" id="card-3">
+  <div class="num">03 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">3 规模 × 1 开关</span>
+  </div>
+  <h1 class="card-h">选哪个 <span class="em">规模</span>？</h1>
+  <p style="font-size:12px;color:var(--t2);margin-bottom:14px">v5.1 的 3 mode → v7.0.0 的 3 规模 + 1 正交开关</p>
+
+  <div class="grid2">
+    <div class="box" style="border-color:#86EFAC">
+      <h3>lightweight <span class="pill b-ok" style="font-size:9px">小修</span></h3>
+      <p>3 角色 · 跳过 ②③ · 只产低保真 · 简版 PRD</p>
+    </div>
+    <div class="box" style="border-color:#93C5FD;background:var(--pri-bg)">
+      <h3>standard <span class="pill b-pri" style="font-size:9px">默认</span></h3>
+      <p>13 角色 · ②③ 串行 · 低+高保真 · 完整 14 模块 PRD · kg_refs 必填</p>
+    </div>
+  </div>
+  <div class="box" style="border-color:#C4B5FD;background:#EDE9FE;margin-top:12px">
+    <h3>complex <span class="pill b-purple" style="font-size:9px">战略</span></h3>
+    <p>13+3 角色 · KG 深度追溯 · 反例防模板污染 · 宪法 8 条逐条对照</p>
+  </div>
+
+  <div class="callout"><b>正交开关 <code style="color:var(--pri);font-family:ui-monospace,Menlo,monospace">deliver_code</code></b><br>
+    <span class="pill b-ok">false</span> 默认：止于 PRD + 原型，不改任何代码<br>
+    <span class="pill b-warn">true</span> 继续实施改造 + 测试报告（高风险）</div>
+
+  <div class="footer">
+    <span class="credit">v5.1 lean_pm/standard/enhanced → v7.0.0 3 规模 × 开关</span>
+    <span class="next">→ 谁在干活</span>
+  </div>
+</div>
+
+<!-- ========== Card 4: 13+3 角色 ========== -->
+<div class="card" id="card-4">
+  <div class="num">04 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">13 角色</span>
+  </div>
+  <h1 class="card-h">谁在帮你 <span class="em">干活</span>？</h1>
+  <p style="font-size:12px;color:var(--t2);margin-bottom:10px">13 常驻 + 3 复杂扩展 · 会话内 agent 内扮演多角色（无独立进程）</p>
+
+  <div class="role"><div class="avatar" style="background:#2563EB">编</div><div class="info"><div class="name">主编排</div><div class="what">全程调度 / 状态机 / 归档</div><div class="when">全程</div></div></div>
+  <div class="role"><div class="avatar" style="background:#0EA5E9">调</div><div class="info"><div class="name">调研员 + 行业分析 + 用例转写</div><div class="what">代码走查 + 联网竞品 + 转写标准用例</div><div class="when">②③</div></div></div>
+  <div class="role"><div class="avatar" style="background:#8B5CF6">研</div><div class="info"><div class="name">用户研究</div><div class="what">画像 + 场景卡 + 故事地图 + 旅程图</div><div class="when">④</div></div></div>
+  <div class="role"><div class="avatar" style="background:#EC4899">设</div><div class="info"><div class="name">功能设计 + 指标 + 合规</div><div class="what">RICE + 北极星指标 + 合规审查</div><div class="when">⑤</div></div></div>
+  <div class="role"><div class="avatar" style="background:#F59E0B">原</div><div class="info"><div class="name">策略风控 + 原型</div><div class="what">边界 + 降级链 + 低保真/高保真 HTML</div><div class="when">⑥⑦</div></div></div>
+  <div class="role"><div class="avatar" style="background:#10B981">测</div><div class="info"><div class="name">测试 + PRD</div><div class="what">测试用例集 + 14 模块 PRD</div><div class="when">⑦</div></div></div>
+  <div class="role"><div class="avatar" style="background:#EF4444">评</div><div class="info"><div class="name">评审 critic + QA <span class="pill b-warn" style="font-size:9px">双岗</span></div><div class="what">中途打回 / 终审 + 来源标注</div><div class="when">⑥⑦⑧</div></div></div>
+
+  <div class="callout"><b>复杂扩展（仅 complex 激活）：</b>法律顾问 / 资深架构师 / 用户研究员</div>
+
+  <div class="footer">
+    <span class="credit">v5.1 三省六部 8 agent → v7.0.0 13 常驻 + 3 扩展</span>
+    <span class="next">→ 什么时候干活</span>
+  </div>
+</div>
+
+<!-- ========== Card 5: 介入矩阵 ========== -->
+<div class="card" id="card-5">
+  <div class="num">05 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">介入矩阵</span>
+  </div>
+  <h1 class="card-h">谁在 <span class="em">什么时候</span> 干活？</h1>
+  <p style="font-size:12px;color:var(--t2);margin-bottom:10px">8 阶段 × 14 角色 · 一眼看出谁闲谁忙</p>
+
+  <table class="matrix">
+    <tr><th>角色</th><th>①</th><th>②</th><th>③</th><th>④</th><th>门1</th><th>⑤</th><th>⑥</th><th>门3</th><th>⑦</th><th>机门</th><th>⑧</th><th>门4</th></tr>
+    <tr><td class="r">主编排</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td><td class="on">●</td></tr>
+    <tr><td class="r">调研员</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">行业分析</td><td class="off">○</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">用例转写</td><td class="off">○</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">用户研究</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">功能设计</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">指标/合规</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">策略风控</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">原型</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">测试</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">PRD</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="on">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">critic</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="g">●</td><td class="g">●</td><td class="off">○</td><td class="off">○</td><td class="off">○</td></tr>
+    <tr><td class="r">QA</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="on">●</td><td class="off">○</td></tr>
+    <tr><td class="r">PM（你）</td><td class="g">发</td><td class="g">答</td><td class="off">○</td><td class="off">○</td><td class="g">拍</td><td class="off">○</td><td class="off">○</td><td class="g">拍</td><td class="off">○</td><td class="off">○</td><td class="off">○</td><td class="g">验</td></tr>
+  </table>
+
+  <div style="font-size:11px;color:var(--t2);margin-top:6px">●执行　○不介入　发/答/拍/验=PM 决策</div>
+
+  <div class="footer">
+    <span class="credit">complex 规模示例 · standard 跳过 ②③ 行</span>
+    <span class="next">→ 怎么保证不垃圾</span>
+  </div>
+</div>
+
+<!-- ========== Card 6: 质量防线 ========== -->
+<div class="card" id="card-6">
+  <div class="num">06 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">20 防线</span>
+  </div>
+  <h1 class="card-h">怎么保证 <span class="em">不垃圾</span>？</h1>
+  <p style="font-size:12px;color:var(--t2);margin-bottom:10px">3 层防线 · 机器 + 流程 + 共识</p>
+
+  <div style="display:flex;gap:8px;margin:8px 0">
+    <div class="box" style="flex:1;background:var(--pri-bg);border-color:var(--pri-h)">
+      <h3>🛡 机器</h3>
+      <p>20 guardrail<br>自动跑 P0 fail</p>
+    </div>
+    <div class="box" style="flex:1;background:#EDE9FE;border-color:var(--purple)">
+      <h3>🚦 流程</h3>
+      <p>4 人工门<br>critic+QA 双岗</p>
+    </div>
+    <div class="box" style="flex:1;background:var(--ok-bg);border-color:var(--ok)">
+      <h3>📜 共识</h3>
+      <p>宪法 8 条<br>KG 反例防污染</p>
+    </div>
+  </div>
+
+  <div class="callout"><b>实战：</b><code>g001</code> 在示例需求抓到 13 处裸百分比<br>
+    <code style="color:var(--danger)">❌ 持久化率 **100%**</code><br>
+    <code style="color:var(--ok)">✓ 持久化率 **100%**（来源：本需求目标值；现状基线 0%）</code></div>
+
+  <div style="display:flex;justify-content:center;margin-top:6px">
+    <span class="pill b-ok">实测：契约校验 16/4 → 18/2 → 20/0 PASS</span>
+  </div>
+
+  <div class="footer">
+    <span class="credit">v7.0.0 防线体系 · 实战验证</span>
+    <span class="next">→ 你只在 4 个门</span>
+  </div>
+</div>
+
+<!-- ========== Card 7: 4 人工门 ========== -->
+<div class="card" id="card-7">
+  <div class="num">07 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">4 门</span>
+  </div>
+  <h1 class="card-h">你只用在 <span class="em">4 个门</span> 上</h1>
+  <p style="font-size:12px;color:var(--t2);margin-bottom:14px">v5.1 的 9 道门 → v7.0.0 的 ≤4 次打断</p>
+
+  <div style="background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:var(--r-md);padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
+    <div style="width:42px;height:42px;border-radius:50%;background:var(--warn);color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:3px">门 1 · 场景与旅程</div>
+      <div style="font-size:12px;color:var(--t1);line-height:1.55">④ 后：场景卡 + 故事地图 + 旅程图是否对齐用户真实痛点？</div>
+    </div>
+  </div>
+
+  <div style="background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:var(--r-md);padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
+    <div style="width:42px;height:42px;border-radius:50%;background:var(--warn);color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:3px">门 2 · 功能表与方案</div>
+      <div style="font-size:12px;color:var(--t1);line-height:1.55">⑤ 后：RICE 优先级 + 指标基线 + 合规审查是否闭环？</div>
+    </div>
+  </div>
+
+  <div style="background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:var(--r-md);padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
+    <div style="width:42px;height:42px;border-radius:50%;background:var(--warn);color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:3px">门 3 · 原型</div>
+      <div style="font-size:12px;color:var(--t1);line-height:1.55">⑥ 后：截图+交互是否能支撑 §6 功能说明？</div>
+    </div>
+  </div>
+
+  <div style="background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:var(--r-md);padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
+    <div style="width:42px;height:42px;border-radius:50%;background:var(--warn);color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:3px">门 4 · 交付验收</div>
+      <div style="font-size:12px;color:var(--t1);line-height:1.55">⑧ 后：机器门 + 宪法 8 条 + 来源标注是否全部通过？</div>
+    </div>
+  </div>
+
+  <div class="callout">🛡 <b>机器门自动跑</b>（不占打断次数）：<code>validate_contract.py</code> ⑦ 末与 ⑧ 自动触发</div>
+
+  <div class="footer">
+    <span class="credit">v7.0.0 4 人工门 + 机器门自动跑</span>
+    <span class="next">→ 总结</span>
+  </div>
+</div>
+
+<!-- ========== Card 8: 总结 ========== -->
+<div class="card" id="card-8">
+  <div class="num">08 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">总结</span>
+  </div>
+
+  <h1 style="font-size:32px;font-weight:700;margin-top:60px;line-height:1.3;letter-spacing:-.5px">
+    让 PRD 流水线<br>
+    像 <span class="em">自来水</span><br>
+    一样跑起来
+  </h1>
+
+  <div class="grid2" style="margin-top:24px">
+    <div class="box">
+      <h3>✓ 13+3 角色编队</h3>
+      <p>调研/用户/功能/指标<br>合规/风控/原型/测试</p>
+    </div>
+    <div class="box">
+      <h3>✓ 128 知识图谱</h3>
+      <p>跨 REQ 复用<br>反例防模板污染</p>
+    </div>
+    <div class="box">
+      <h3>✓ 20 防线</h3>
+      <p>机器 + 流程 + 共识<br>实战验证有效</p>
+    </div>
+    <div class="box">
+      <h3>✓ 双份归档</h3>
+      <p>runs/ 执行流<br>+需求产出/ 长期归口</p>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:16px">
+    <b>下一步：</b>在 WorkBuddy 会话里加载 Skill<br>
+    <code style="font-family:ui-monospace,Menlo,monospace">SKILL.md @ .workbuddy/skills/产品自动化工作流/</code>
+  </div>
+
+  <div class="footer" style="margin-top:auto">
+    <span class="credit">v7.0.0 · Skill 形态 · 合并定稿 2026-09-16</span>
+    <span class="next">— END —</span>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

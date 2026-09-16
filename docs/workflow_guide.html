@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品自动化工作流 · 使用指南 v7.0.0</title>
+<style>
+  :root{
+    --surface:#F9FAFB; --card:#FFFFFF; --border:#D1D5DB;
+    --text:#111827; --text-2:#6B7280; --text-3:#9CA3AF;
+    --primary:#2563EB; --primary-h:#3B82F6; --primary-bg:#EFF6FF;
+    --success:#22C55E; --success-bg:#F0FDF4;
+    --danger:#EF4444; --danger-bg:#FEF2F2;
+    --warning:#F59E0B; --warning-bg:#FFFBEB;
+    --purple:#8B5CF6; --purple-bg:#EDE9FE;
+    --r-sm:4px; --r-md:8px; --r-lg:12px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--surface);color:var(--text);line-height:1.65;font-size:14px}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px}
+
+  /* Header */
+  header{background:linear-gradient(135deg,#111827,#1f2937);color:#fff;padding:36px 24px;border-radius:var(--r-lg);margin-bottom:16px}
+  header h1{font-size:25px;margin-bottom:6px;font-weight:600}
+  header p{color:var(--text-3);font-size:13px}
+  header .tag{display:inline-block;background:var(--primary);color:#fff;font-size:11px;font-weight:600;padding:2px 10px;border-radius:9999px;margin-left:8px;vertical-align:middle}
+  header .kpi{display:flex;gap:24px;margin-top:14px;padding-top:14px;border-top:1px solid #374151}
+  header .kpi .item .v{font-size:20px;font-weight:700;color:#60A5FA;font-family:ui-monospace,Menlo,monospace}
+  header .kpi .item .l{font-size:11px;color:var(--text-3);margin-top:2px}
+
+  h2{font-size:18px;font-weight:600;margin:34px 0 6px;padding-left:10px;border-left:4px solid var(--primary)}
+  h3{font-size:15px;font-weight:600;margin:18px 0 6px}
+  .hint{font-size:12.5px;color:var(--text-2);margin-bottom:12px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:16px;margin-bottom:14px}
+
+  /* 流程节点 */
+  .lane{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+  .stage{background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px;text-align:center;flex:1 1 100px;min-width:96px}
+  .stage b{display:block;font-size:13px}
+  .stage small{color:var(--text-2);font-size:11px;display:block;margin-top:2px}
+  .stage.gate{border:2px solid var(--warning);background:var(--warning-bg)}
+  .stage.gate b{color:#92400E}
+  .stage.auto{background:var(--primary-bg);border-color:var(--primary-h)}
+  .stage.done{background:var(--success-bg);border-color:var(--success)}
+  .stage.done b{color:var(--success)}
+  .arrow{color:var(--text-3);font-size:16px;flex:0 0 auto}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;background:var(--card)}
+  th,td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#F3F4F6;font-weight:600;font-size:12px}
+  tr:nth-child(even) td{background:#FAFAFA}
+  td.c{text-align:center}
+  code{background:#F3F4F6;border:1px solid var(--border);border-radius:var(--r-sm);padding:1px 6px;font-size:12px;font-family:ui-monospace,Menlo,monospace}
+
+  .pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:9999px;margin:2px 2px 0 0}
+  .pill.m{background:#DCFCE7;color:#166534}
+  .pill.h{background:#FEF3C7;color:#92400E}
+  .pill.s{background:#DBEAFE;color:#1E40AF}
+  .pill.p{background:var(--purple-bg);color:#5B21B6}
+  .pill.d{background:var(--danger-bg);color:var(--danger)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .box{background:#F9FAFB;border:1px solid var(--border);border-radius:var(--r-md);padding:14px}
+  .box h4{font-size:13px;font-weight:600;margin-bottom:4px}
+  .box p{font-size:12px;color:var(--text-2);line-height:1.6}
+  .box ul{margin-top:6px;list-style:none;font-size:12px;color:var(--text-2);line-height:1.7}
+  .box ul li::before{content:"· ";color:var(--primary);font-weight:700}
+
+  /* 编号色块 */
+  .idcode{display:inline-block;font-family:ui-monospace,monospace;font-size:12px;background:#F3F4F6;border:1px solid var(--border);border-radius:var(--r-sm);padding:0 6px;margin-right:2px}
+
+  footer{margin-top:28px;color:var(--text-2);font-size:12px;text-align:center;padding:14px}
+  .kbd{background:#111827;color:#fff;border-radius:var(--r-sm);padding:2px 8px;font-size:12px;font-family:ui-monospace,monospace}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>产品自动化工作流 · 使用指南<span class="tag">v7.0.0</span></h1>
+  <p>13 常驻角色 + 3 复杂扩展 · 4 人工门 + 机器门自动跑 · 20 条 Guardrail · 与 WorkBuddy 项目级 Skill 同源</p>
+  <div class="kpi">
+    <div class="item"><div class="v">13+3</div><div class="l">常驻 + 扩展角色</div></div>
+    <div class="item"><div class="v">≤4</div><div class="l">人工门（打断次数）</div></div>
+    <div class="item"><div class="v">20</div><div class="l">Guardrail 机器门</div></div>
+    <div class="item"><div class="v">128</div><div class="l">KG 实体</div></div>
+  </div>
+</header>
+
+<!-- ============ 1 主流程 ============ -->
+<h2>一、主流程（一条 8 阶段单循环）</h2>
+<p class="hint">v5.1 的 24 状态机 + 3 mode → v7.0.0 的<b>单循环 + 3 规模 × <code>deliver_code</code> 开关</b>。流程本身不变，规模只决定哪些站跳过、哪些站加深。</p>
+<div class="card">
+  <div class="lane">
+    <div class="stage done"><b>① 澄清</b><small>背景/角色/边界</small></div>
+    <div class="arrow">→</div>
+    <div class="stage"><b>② 调研</b><small>代码走查 + KG</small></div>
+    <div class="arrow">→</div>
+    <div class="stage"><b>③ 用例</b><small>竞品 + 转写</small></div>
+    <div class="arrow">→</div>
+    <div class="stage"><b>④ 场景</b><small>画像 + 旅程图</small></div>
+    <div class="arrow">→</div>
+    <div class="stage gate"><b>门 1</b><small>场景/旅程</small></div>
+    <div class="arrow">→</div>
+    <div class="stage"><b>⑤ 功能表</b><small>RICE + 指标 + 合规</small></div>
+    <div class="arrow">→</div>
+    <div class="stage gate"><b>门 2</b><small>方案评审</small></div>
+  </div>
+  <div class="lane">
+    <div class="stage"><b>⑥ 低保真</b><small>线框 + 交互</small></div>
+    <div class="arrow">→</div>
+    <div class="stage gate"><b>门 3</b><small>原型评审</small></div>
+    <div class="arrow">→</div>
+    <div class="stage"><b>⑦ 高保真 + PRD</b><small>14 模块 + 截图</small></div>
+    <div class="arrow">→</div>
+    <div class="stage auto"><b>机器门</b><small>20 防线</small></div>
+    <div class="arrow">→</div>
+    <div class="stage done"><b>⑧ QA 终审</b><small>来源标注</small></div>
+    <div class="arrow">→</div>
+    <div class="stage gate"><b>门 4</b><small>交付验收</small></div>
+    <div class="arrow">→</div>
+    <div class="stage done"><b>归档</b><small>需求产出/</small></div>
+  </div>
+  <p style="margin-top:8px;font-size:12px;color:var(--text-2)">💡 ④⑤⑥ 任一环节打回都回到对应站修订（不限轮数）；机器门（<code>validate_contract.py</code>）随阶段自动跑，<b>不占打断次数</b>。</p>
+</div>
+
+<!-- ============ 2 三规模 ============ -->
+<h2>二、3 规模 × 1 个正交开关 <code>deliver_code</code></h2>
+<p class="hint">v5.1 的 3 mode（lean_pm / standard / enhanced）→ v7.0.0 的 3 规模 + 1 开关，更灵活也更易演进。</p>
+
+<div class="card">
+  <div class="grid2">
+    <div class="box">
+      <h4>lightweight <span class="pill s">小修</span></h4>
+      <p style="font-size:11px;color:var(--text-3);margin-bottom:6px">3 角色 · 3 阶段</p>
+      <ul>
+        <li>跳过 ②③ 调研</li>
+        <li>只产低保真</li>
+        <li>简版 PRD</li>
+      </ul>
+    </div>
+    <div class="box" style="background:var(--primary-bg);border-color:var(--primary-h)">
+      <h4>standard <span class="pill s">默认</span></h4>
+      <p style="font-size:11px;color:var(--text-3);margin-bottom:6px">13 角色 · 全流程</p>
+      <ul>
+        <li>②③ 串行调研</li>
+        <li>低 + 高保真</li>
+        <li>完整 14 模块 PRD</li>
+        <li>kg_refs 必填</li>
+      </ul>
+    </div>
+    <div class="box" style="background:var(--purple-bg);border-color:var(--purple)">
+      <h4>complex <span class="pill p">战略</span></h4>
+      <p style="font-size:11px;color:var(--text-3);margin-bottom:6px">13+3 角色 · KG 追溯</p>
+      <ul>
+        <li>②③ 深度对比</li>
+        <li>KG 反例防模板污染</li>
+        <li>扩展 3 角色</li>
+        <li>宪法 8 条逐条对照</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="margin-top:14px"><code>deliver_code</code> 正交开关</h3>
+  <p style="font-size:12.5px;color:var(--text-2);line-height:1.7">
+    <span class="pill m">false（默认）</span>
+    止于 ⑦ 高保真 + PRD + 测试用例，<b>不改动任何代码</b>——本轮示例需求即此模式。<br>
+    <span class="pill d">true</span>
+    ⑦ 后继续实施改造 + 测试报告，会真实改动参考项目代码——属于<b>高风险操作</b>。
+  </p>
+</div>
+
+<!-- ============ 3 13+3 角色 ============ -->
+<h2>三、13 常驻角色 + 3 复杂扩展</h2>
+<p class="hint">v5.1 三省六部 8 agent → v7.0.0 13 常驻（按职能命名）+ complex 3 扩展。<b>关键分工</b>：<code>评审 critic</code>（中途独立打回）≠ <code>QA</code>（终审 + 来源标注）。</p>
+<div class="card">
+  <table>
+    <tr><th>角色</th><th>主产出</th><th>阶段</th><th>light</th><th>std</th><th>cmpx</th></tr>
+    <tr><td><b>主编排</b></td><td>调度 / 状态 / 归档</td><td>全程</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>调研员</td><td>代码走查 + KG</td><td>②</td><td class="c">简化</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>行业分析</td><td>联网竞品</td><td>③</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>用例转写</td><td>标准用例</td><td>③</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>用户研究</td><td>画像 + 场景卡 + 故事地图 + 旅程图</td><td>④</td><td class="c">简化</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>功能设计</td><td>RICE</td><td>⑤</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>指标</td><td>北极星 + 过程指标</td><td>⑤</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>合规</td><td>合规审查 + 免责</td><td>⑤</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>策略风控</td><td>边界 + 降级链</td><td>⑥</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>原型</td><td>低 + 高保真 HTML</td><td>⑥⑦</td><td class="c">低保真</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>测试</td><td>用例集</td><td>⑦</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>PRD</td><td>14 模块</td><td>⑦</td><td class="c">简版</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td>评审 <b>critic</b></td><td>中途独立打回</td><td>⑥⑦</td><td class="c">—</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr><td><b>QA</b>（终审）</td><td>终审 + 来源标注</td><td>⑧</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+    <tr style="background:var(--purple-bg)">
+      <td><b>法律顾问</b>（+）</td><td>深度合规 / 跨境</td><td>⑤</td><td class="c">—</td><td class="c">—</td><td class="c">✓</td></tr>
+    <tr style="background:var(--purple-bg)">
+      <td><b>用户研究员</b>（+）</td><td>实地访谈 / 可用性</td><td>④</td><td class="c">—</td><td class="c">—</td><td class="c">✓</td></tr>
+    <tr style="background:var(--purple-bg)">
+      <td><b>资深架构师</b>（+）</td><td>技术债务评估</td><td>⑤</td><td class="c">—</td><td class="c">—</td><td class="c">✓</td></tr>
+  </table>
+</div>
+
+<!-- ============ 4 日常使用 ============ -->
+<h2>四、日常怎么用</h2>
+<div class="card">
+  <table>
+    <tr><th style="width:18%">场景</th><th style="width:42%">你说什么</th><th>会发生什么</th></tr>
+    <tr><td rowspan="3"><b>需求生命周期</b></td>
+      <td><code>提需求：XXX</code>（一句话开局）</td>
+      <td>主编排判定 lightweight/standard/complex + <code>deliver_code</code> 开关 → 全流程自动推进</td></tr>
+    <tr><td><code>升级到 complex</code> / /<code>降到 lightweight</code></td><td>重新判级，补跑被跳过的站</td></tr>
+    <tr><td><code>改需求：XXX</code></td><td>标记 SCOPE_CHANGE，回判级重走受影响站</td></tr>
+    <tr><td rowspan="2"><b>流程中调控</b></td>
+      <td><code>跳过 X 阶段</code> / <code>开启 Y 门</code></td><td>单次跳过或打开对应站（计入 INDEX）</td></tr>
+    <tr><td><code>打回：原型 配色不符</code></td><td>记 feedback_log，路由对应角色修订</td></tr>
+    <tr><td rowspan="2"><b>查与收尾</b></td>
+      <td><code>查历史类似需求</code></td><td>查知识图谱，列出历史画像/场景/教训</td></tr>
+    <tr><td><code>完成本需求</code></td><td>QA 终审 → 归档到 <code>&lt;需求名&gt;需求产出/</code> → 自动入库 KG</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:12px;color:var(--text-2)">💡 你只需要在<b>门 1–4</b>（≤ 4 次））上拍板，其余全自动。</p>
+</div>
+
+<!-- ============ 5 质量防线 ============ -->
+<h2>五、质量防线：20 条 Guardrail + 8 条宪法</h2>
+<p class="hint">机器门 <code>validate_contract.py</code> 在 ⑦ 末与 ⑧ 自动触发，<b>不占打断次数</b>。本轮示例需求实测：<span class="pill m">16/4 → 18/2 → 20/0 PASS</span>，<code>g001</code> 实际抓到 13 处裸百分比，<code>g014</code> 强制至少 1 条反例。</p>
+
+<div class="card">
+  <p style="margin-bottom:10px">
+    <span class="pill m">20 条机器自动跑</span>
+    <span class="pill h">3 条人工 · g005 / g006 / g106</span>
+    <span class="pill p">宪法 8 条人工对照</span>
+    <span class="pill s">spec 质量门 6 机器</span>
+  </p>
+  <table>
+    <tr><th style="width:14%">编号段</th><th>管谁</th><th>具体内容（拦什么）</th></tr>
+    <tr><td><span class="idcode">g001-g004</span></td><td>内容真实性</td><td><b>g001</b> 数据要有来源或"假设"标注 · g002 禁 TBD · g003 禁"体验流畅"类空话 · g004 禁"…等"收尾</td></tr>
+    <tr><td><span class="idcode">g007-g013</span></td><td>方案完整性</td><td>g007 禁反问句 · g008 边界条件必写 · g009 持久化方案必写 · g010 数据时间戳必写 · g011 降级链路必写 · g012 算法边界必写 · g013 原型-PRD 对齐</td></tr>
+    <tr><td><span class="idcode">g014</span></td><td><b>知识复用</b></td><td>standard/complex <b>kg_refs 必填</b>，至少 1 条 <code>role: counter_example</code>（防模板污染）</td></tr>
+    <tr><td><span class="idcode">g015</span></td><td>原型专属</td><td>HTML/方案里的颜色必须引用 design_tokens，硬编码色值 = 打回</td></tr>
+    <tr><td><span class="idcode">g101-g108</span></td><td>各角色专属</td><td>用户研究：画像要标来源 · 功能设计：编号唯一 · 指标：禁主观判词 · 合规：必须三选一结论 · 测试：缺陷必标级别 · 评审：判据必须引原文到行号</td></tr>
+    <tr><td><span class="idcode">g005 g006 g106</span></td><td>流程层（人工）</td><td>不跳级传递 · 跨文件编号一致 · P0 流程原型必覆盖</td></tr>
+    <tr><td><span class="idcode">s001-s006</span></td><td>PRD 结构</td><td>章节完整 · 验收 EARS 句式 · user story ≥3 · FR 编号唯一 · 有 API 契约与错误码 · FR↔AC↔指标闭环</td></tr>
+    <tr><td><span class="idcode">c001-c008</span></td><td>项目宪法</td><td>数据带时效 · 外部依赖必有降级链 · 计算必覆盖边界 · 原型/PRD/API 三方对齐 · 等等（从 9 条历史教训沉淀）</td></tr>
+  </table>
+  <p style="margin-top:8px;font-size:12px;color:var(--text-2)">读审核报告举例：<code>P0 g011 L42 — 依赖外部接口但无"降级"描述</code>。怎么跑：<code>python3 scripts/validate_contract.py --file runs/&lt;run-id&gt;/prd.md --agent bingbu --scale complex --strictness strict --merged-prd</code></p>
+</div>
+
+<!-- ============ 6 产出目录 ============ -->
+<h2>六、产出目录约定</h2>
+<div class="card">
+<pre style="font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.8;background:#F9FAFB;padding:14px;border-radius:8px;border:1px solid var(--border);overflow-x:auto">工作流-产品/
+├── runs/&lt;run-id&gt;/                     # 本次运行过程留痕（执行流）
+│   ├── execution-log.md               # 状态契约 + 机器门/人工门记录
+│   ├── clarify.md  research.md  scenarios.md  journey-map.md  story-map.md
+│   ├── feature-table.md  wireframe.md  prd.md  test-cases.md
+│   ├── prototype/                     # 高保真 HTML（双击即开）
+│   └── screenshots/                   # 页面截图（PRD §6 引用）
+├── &lt;需求名&gt;需求产出/                   # 可见交付副本（中文名映射）
+├── 归档需求产出/&lt;REQ-ID&gt;/              # 历史归档（保留原编号）
+├── contracts/                          # 契约（constitution / guardrails）
+└── knowledge_graph/                    # 知识图谱（128 实体）</pre>
+</div>
+
+<footer>
+  产品自动化工作流 v7.0.0 · 合并定稿 2026-09-16 · 与 <code>.workbuddy/skills/产品自动化工作流/SKILL.md</code> 同步<br>
+  桌面端（本页）+ 移动端 <code>workflow_guide_h5.html</code>
+</footer>
+
+</div>
+</body>
+</html>

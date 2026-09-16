@@ -1,0 +1,10 @@
+_type: Guardrail
+id: g106
+name: 原型-A2-P0 流程必覆盖
+category: agent_specific
+agent: gongbu
+severity: P0
+check_pattern: "原型必须至少覆盖所有 P0 功能的交互流程"
+source: workflow/_archive/contracts.v1.md#L88
+created: 2026-07-03
+status: active

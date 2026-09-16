@@ -1,0 +1,136 @@
+# progress 字段映射表（v3.3 新增）
+# ====================================================
+# state.json 的 progress 字段由主编排（dispatcher）在状态切换时自动维护。
+# PM 看 dashboard 时可读 progress.current_step_human / next_action。
+# ====================================================
+
+_version: "1.0.0"
+_last_updated: 2026-07-15
+_owner: 主编排
+
+# --------------------------------------------------------
+# state.progress 字段定义
+# --------------------------------------------------------
+progress_schema:
+  current_step:
+    type: string
+    description: 当前状态机的步骤 ID（1_clarifying/2_prd_draft/3_lowfi/4_hifi/5_delivery/6_covered）
+    required: true
+  current_step_human:
+    type: string
+    description: PM 视角的中文步骤名（如"需求澄清（5 阶段苏格拉底）"）
+    required: true
+  total_steps:
+    type: int
+    description: 模式对应总步数（lean_pm=5, enhanced_pm=6, standard_pm=4）
+    required: true
+  percent:
+    type: int
+    description: 进度百分比 0-100
+    required: true
+  next_action:
+    type: string
+    description: 主编排给 PM 的人话提示
+    required: true
+  next_questions:
+    type: array
+    description: 待答问题清单（澄清门/苏格拉底门用）
+    required: false
+  eta_minutes:
+    type: int
+    description: 预计剩余时间（分钟）
+    required: false
+
+# --------------------------------------------------------
+# 步骤 ID → 中文标签 + 默认 next_action
+# --------------------------------------------------------
+steps:
+  - id: 1_clarifying
+    label: "需求澄清（5 阶段苏格拉底）"
+    next_action_default: "请按 5 阶段苏格拉底问题逐条回答（背景 → 用户 → 场景 → 功能 → 指标）"
+    next_questions_template: "socratic_5phases_p1"
+  - id: 2_prd_draft
+    label: "PRD 草稿（6 组并行起草 + 合并）"
+    next_action_default: "请打开 prd.md 一眼扫过，确认 FR 清单是否覆盖所有需求"
+    next_questions_template: null
+  - id: 3_lowfi
+    label: "低保真原型（HTML 静态）"
+    next_action_default: "请打开 prototype/index.html，5 分钟内审完确认"
+    next_questions_template: null
+  - id: 4_hifi
+    label: "高保真原型（HTML+动效+流程）"
+    next_action_default: "请审高保真 + 检查异常流程（断网/超时/空数据）"
+    next_questions_template: null
+  - id: 5_delivery
+    label: "交付包（PRD 终版 + 原型 + 用例）"
+    next_action_default: "请确认收到交付包，触发 RELEASING 自动整理 release_notes"
+    next_questions_template: null
+  - id: 6_covered
+    label: "已交付"
+    next_action_default: "如发现 BUG 可说'修 bug' 启动 BUG_FIXING 工作流"
+    next_questions_template: null
+
+# --------------------------------------------------------
+# 苏格拉底 5 阶段问题模板
+# --------------------------------------------------------
+socratic_5phases_p1:
+  - "阶段 1：谁最痛？痛到什么程度？痛的人具体是谁？"
+  - "阶段 1：为什么会痛？现状是怎么凑合的？"
+  - "阶段 1：痛的人具体是谁（角色/画像/人数）？"
+  - "阶段 2：核心要解决 1 件事是什么？"
+  - "阶段 2：不解决的最大代价？3 个月后什么样？"
+
+# --------------------------------------------------------
+# 主编排（dispatcher）每阶段切换时自动做的事
+# --------------------------------------------------------
+dispatcher_loop:
+  on_state_change:
+    1: "更新 state.json.progress 字段"
+    2: "更新 state.json.phase 字段"
+    3: "在对话中输出：当前阶段 + 下一步 + 待答问题"
+    4: "如果当前是评审门：写 review.md 并停下等 PM"
+    5: "如果当前是完成态：调 deliver_hook.sh + render_dashboard.py --obsidian"
+
+# --------------------------------------------------------
+# 与 mode 字段的关系
+# --------------------------------------------------------
+# v6.0：mode 语义更新为"入口选择器"（lean_pm=快速 / standard_pm=标准 / enhanced_pm=深度），
+# 值保持不变以兼容 state.json 与脚本；total_steps 仍按入口区分。
+mode_to_total_steps:
+  lean_pm: 5
+  enhanced_pm: 6
+  standard_pm: 4
+
+# --------------------------------------------------------
+# 范例（不同 mode 不同进度）
+# --------------------------------------------------------
+examples:
+  - scenario: "lean_pm 起步"
+    progress:
+      current_step: "1_clarifying"
+      current_step_human: "需求澄清（5 阶段苏格拉底）"
+      total_steps: 5
+      percent: 20
+      next_action: "请回答 5 阶段苏格拉底问题"
+      next_questions: ["阶段 1: 谁最痛？"]
+      eta_minutes: 15
+
+  - scenario: "enhanced_pm 中段"
+    progress:
+      current_step: "3_lowfi"
+      current_step_human: "低保真原型（HTML 静态）"
+      total_steps: 6
+      percent: 50
+      next_action: "请打开 prototype/index.html 审"
+      next_questions: []
+      eta_minutes: 5
+
+  - scenario: "完成态"
+    progress:
+      current_step: "6_covered"
+      current_step_human: "已交付"
+      total_steps: 6
+      percent: 100
+      next_action: "PM 确认收，触发 RELEASING"
+      next_questions: []
+      eta_minutes: 0

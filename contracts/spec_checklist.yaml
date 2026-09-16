@@ -1,0 +1,45 @@
+# Spec 质量门（v6.0 · P2-1，借鉴 Spec Kit "unit tests for English" + analyze）
+# =========================================================================
+# reviewer 审核 PRD 时的结构化清单；标 machine: true 的项由 validate_contract.py
+# 第 10 步自动执行（仅 shangshu 的 prd.md / final_prd.md 合并稿），标 false 的人工对照。
+# 任何 machine 项不通过 → 打回，不得凭感觉放行。
+# =========================================================================
+
+_version: "1.0.0"
+
+checklist:
+  - id: s001
+    name: 完整性
+    machine: false            # 已由 prd_format（第 8 步）机器覆盖，此处人工复核
+    check: 10 章齐全且无空章节（每章 ≥ 3 行实质内容）
+
+  - id: s002
+    name: 可测性（EARS）
+    machine: true
+    check: 第 5 章验收标准 ≥ 3 条 AC-NN 编号且为 EARS 句式（当…系统应…）
+    fail_hint: 把验收标准改写为 "AC-NN 当[条件]，系统应[可观察行为]"
+
+  - id: s003
+    name: 用户故事
+    machine: true
+    check: US-NN 编号 user story ≥ 3 条且每条挂场景（对应 S#）
+    scale_required: [standard, complex]
+    fail_hint: 第 4 章补 5-8 条 "作为<角色>我要<行为>以便<价值>"
+
+  - id: s004
+    name: FR 编号全局唯一
+    machine: true
+    check: 全文 FR-NN 编号无重复（P1/P2 分段的编号连续不冲突）
+    fail_hint: 参照 REQ-005 曾出现的 P1/P2 编号冲突，按优先级顺序重排
+
+  - id: s005
+    name: 接口契约
+    machine: true
+    check: 第 8 章含 API 契约示例（HTTP 方法 + JSON 示例）与错误码字典
+    scale_required: [standard, complex]
+    fail_hint: 第 8 章补 8.1 数据结构 / 8.2 API 契约 / 8.3 错误码字典
+
+  - id: s006
+    name: 跨制品一致性
+    machine: false            # 对应 Spec Kit analyze，人工或下版本实现
+    check: FR ↔ AC ↔ 指标互引闭环（每个 FR 有 AC，每个北极星指标有 FR 支撑）

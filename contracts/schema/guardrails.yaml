@@ -1,0 +1,275 @@
+# 产出防线（Guardrails）
+# =========================================================================
+# 23 条防线：13 条通用 + 9 条 Agent 专用 + 1 条 KG 引用（v6.0 新增 g015）
+# 其中 20 条由 scripts/validate_contract.py 机械校验；
+# g005/g006/g106 属流程层/跨文件校验（machine_check: false），由reviewer人工执行
+# =========================================================================
+
+_version: "2.0.0"
+
+# ============================================================================
+# 通用防线（13 条，所有 Agent 必守）
+# ============================================================================
+universal:
+  - id: g001
+    name: 不得捏造事实
+    severity: P0
+    applies_to: [all]
+    check_pattern: |
+      任何用户画像/场景/竞品/指标数据/接口响应声明
+      必须能溯源到 PM 原始需求，或显式标注"假设 N%"
+    violation_examples:
+      - "同行业平均转化率为 15%（无来源）"
+      - "用户期待 X 功能（无调研支撑）"
+    source: workflow/_archive/contracts.v1.md#l65
+    evolved_from: null
+
+  - id: g002
+    name: 不得标 TBD
+    severity: P0
+    applies_to: [all]
+    check_pattern: |
+      文件中不得出现 `TBD` / `TODO` / `待定` 字样
+      （除非该字段是固定占位符且无实质含义）
+      不确定项必须标 `[⚠️ 假设 80%]` 或方括号待确认
+    violation_examples:
+      - "数据源：TBD"
+      - "接口超时时间：待定"
+    source: workflow/_archive/contracts.v1.md#l66
+
+  - id: g003
+    name: 不得写空话
+    severity: P0
+    applies_to: [all]
+    check_pattern: |
+      禁止出现无度量目标的空洞表述：
+      "体验流畅" / "提升效率" / "简单易用" / "快速响应" / "稳定可靠"
+      （除非附带可二元判断的接受条件）
+    violation_examples:
+      - "页面加载要快"
+      - "操作体验流畅"
+    source: workflow/_archive/contracts.v1.md#l67
+
+  - id: g004
+    name: 不得使用"等"字收尾
+    severity: P0
+    applies_to: [all]
+    check_pattern: |
+      列表/枚举项中"等"字收尾视为不完整
+      补救：标"仅列当前已知项"或"共 N 项，已列完"
+    violation_examples:
+      - "支持文本、图片、视频等格式"
+    source: workflow/_archive/contracts.v1.md#l68
+
+  - id: g005
+    name: 不得跳级传递
+    severity: P0
+    applies_to: [all]
+    machine_check: false  # 依赖 state.json 流程层，校验器不跑，reviewer人工检查
+    check_pattern: |
+      下游 Agent 不得在 state.json 的 step 字段标记为 "pending"
+      的 Agent 之前启动
+    source: workflow/_archive/contracts.v1.md#l69
+
+  - id: g006
+    name: 编号一致性
+    severity: P0
+    applies_to: [all]
+    machine_check: false  # 跨文件校验，单文件校验器不跑，reviewer人工检查
+    check_pattern: |
+      跨文件引用必须使用全局统一编号
+      同一概念在两个文件中用不同编号 → fail
+    violation_examples:
+      - "在 A 文件叫 FR-01，在 B 文件叫 FR-1"
+    source: workflow/_archive/contracts.v1.md#l70
+
+  - id: g007
+    name: 无反问句
+    severity: P0
+    applies_to: [all]
+    check_pattern: |
+      文件中不得出现"？"结尾的反问句
+      开放问题统一在文件末尾 `## 开放问题` 章节
+    violation_examples:
+      - "这个功能真的需要吗？"
+      - "用户会喜欢吗？"
+    source: workflow/_archive/contracts.v1.md#l71
+
+  - id: g008
+    name: 边界条件必填
+    severity: P0
+    applies_to: [all]
+    check_pattern: |
+      每个功能详细说明必须包含"边界条件"和"离线/错误兜底策略"子节
+    violation_examples:
+      - "功能说明中无边界条件章节"
+    source: workflow/_archive/contracts.v1.md#l72
+
+  - id: g009
+    name: 持久化方案必填
+    severity: P0
+    applies_to: [all]
+    check_pattern: |
+      涉及数据存储的功能必须写明持久化方式
+      合法值: LocalStorage / SQLite / PostgreSQL / 内存 / 不持久化
+    source: workflow/_archive/contracts.v1.md#l73
+
+  - id: g010
+    name: 数据时间戳必填
+    severity: P0
+    applies_to: [all]
+    check_pattern: |
+      每个涉及外部数据展示的功能（行情/新闻/基金净值/预测）
+      必须写明"数据更新时间的展示方式"和"数据时效标注"
+    source: workflow/_archive/contracts.v1.md#l74
+
+  - id: g011
+    name: 数据降级链路必写
+    severity: P0
+    applies_to: [all]
+    check_pattern: |
+      每个依赖外部接口的功能必须写明完整降级链路
+      至少 3 级：主数据源 → 备用源 → 离线模拟池 → 不可用提示
+      且每级说明用户看到什么
+    violation_examples:
+      - "只写 1 级降级"
+      - "未说明降级时用户看到什么"
+    source: workflow/_archive/contracts.v1.md#l75
+
+  - id: g012
+    name: 算法边界条件必写
+    severity: P0
+    applies_to: [all]
+    check_pattern: |
+      每个涉及计算/预测/统计/回测的功能必须写明算法边界
+      必含: 零输入 / 满输入 / 单值输入 / 整除边界 / 索引越界 / 时序靠后数据不完整
+    source: workflow/_archive/contracts.v1.md#l76
+
+  - id: g013
+    name: 原型-实施对齐契约
+    severity: P0
+    applies_to: [gongbu, menxia]
+    check_pattern: |
+      原型中的每个交互元素必须在 final_prd.md 中有对应功能说明
+      reviewer必须做"原型-PRD 对齐检查"
+    source: workflow/_archive/contracts.v1.md#l77
+
+# ============================================================================
+# v2.0 新增通用防线（1 条）
+# ============================================================================
+  - id: g014
+    name: 知识图谱引用必填
+    severity: P0
+    applies_to: [libu, bingbu, hubu, libu_compliance, gongbu]
+    applies_to_scale: [standard, complex]
+    check_pattern: |
+      standard/complex 等级的 REQ 产出中必须包含 kg_refs 字段
+      至少 1 个有效 entity_id（entity_id 必须在知识图谱 index.jsonl 中）
+    violation_examples:
+      - "产出中无 ## 知识图谱引用 段"
+      - "kg_refs 引用的 entity_id 不存在于知识图谱"
+    source: 本次 v2.0 重构新增
+    evolved_from: null
+    waived_for_legacy: true  # 见 versioning.yaml#legacy_waivers
+
+# ============================================================================
+# 各 Agent 专用防线（8 条）
+# ============================================================================
+agent_specific:
+  - id: g101
+    name: 用户研究-画像来源标注
+    agent: libu
+    severity: P0
+    check_pattern: |
+      画像必须有来源标注
+      合法值: 基于需求推断 / 基于通用行业认知 / 基于用户调研假设
+    source: workflow/_archive/contracts.v1.md#l83
+
+  - id: g102
+    name: 战略-功能编号全局唯一
+    agent: bingbu
+    severity: P0
+    check_pattern: |
+      功能清单 #编号 在同一 REQ 内全局唯一
+    violation_examples:
+      - "#1 既指新建报销单又指审批报销单"
+    source: workflow/_archive/contracts.v1.md#l84
+
+  - id: g103
+    name: 指标-验收标准可量化
+    agent: hubu
+    severity: P0
+    check_pattern: |
+      验收标准不得使用"响应要快"等主观判词
+      必须用"接口响应时间 < 200ms"等可量化条件
+    source: workflow/_archive/contracts.v1.md#l85
+
+  - id: g104
+    name: 合规-必须三选一
+    agent: libu_compliance
+    severity: P0
+    check_pattern: |
+      每项合规检查必须给出 PASS / NEEDS_REVIEW / BLOCK 三选一
+      不得用"建议咨询法务"代替结论
+    source: workflow/_archive/contracts.v1.md#l86
+
+  - id: g105
+    name: 原型-A1-许可证必标
+    agent: gongbu
+    severity: P0
+    check_pattern: |
+      技术方案的每个组件/依赖必须注明许可证类型
+      合法值: MIT / Apache / GPL / BSD / 商业 / 自研
+    source: workflow/_archive/contracts.v1.md#l87
+
+  - id: g106
+    name: 原型-A2-P0 流程必覆盖
+    agent: gongbu
+    severity: P0
+    machine_check: false  # 需扫描 prototype/ 目录，校验器不跑，reviewer人工检查
+    check_pattern: |
+      原型必须至少覆盖所有 P0 功能的交互流程
+    source: workflow/_archive/contracts.v1.md#l88
+
+  - id: g107
+    name: 审计-缺陷带严重程度
+    agent: xingbu
+    severity: P0
+    check_pattern: |
+      测试缺陷必须标 P0/P1/P2/P3
+      P0 缺陷未修复不得通过审核
+    source: workflow/_archive/contracts.v1.md#l89
+
+  - id: g108
+    name: reviewer-判据引原文
+    agent: menxia
+    severity: P0
+    check_pattern: |
+      所有判据必须引用原文
+      不得笼统说"逻辑有问题"
+      必须具体到文件:行 + 违反契约第几条
+    source: workflow/_archive/contracts.v1.md#l90
+
+  - id: g015
+    name: 原型-设计token约束
+    agent: gongbu
+    severity: P1
+    check_pattern: |
+      原型/方案中出现的设计色值必须在 contracts/design_tokens.yaml 的
+      primitive/semantic 层内（白/黑/透明除外）
+      硬编码任意 hex 色值 = 打回（v6.0 P3-1，借鉴 v0 生态）
+    source: docs/WORKFLOW_BENCHMARK.md#p3-1
+
+# ============================================================================
+# 校验器实现说明
+# ============================================================================
+validator_implementation:
+  file: scripts/guardrail_checkers.py
+  pattern: |
+    每个 Guardrail 对应一个 Python 函数，按 gid 注册到 EVALUATORS 字典
+    函数签名: def gNNN_checker(content: str, agent: str, scale: str) -> dict
+    返回: { "pass": bool, "line": int, "evidence": str, "fix": str }
+
+  unimplemented_fallback: |
+    校验器对未实现的 Guardrail 函数跳过并 WARN，不阻断
+    PM 看到 WARN 后决定手动校验

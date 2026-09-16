@@ -1,0 +1,168 @@
+# 需求分级路由（Scale-aware Routing）
+# =========================================================================
+# 解决原 contracts.md 中等级变更流程缺失、等级判定争议无仲裁的问题
+# =========================================================================
+
+_version: "2.0.0"
+
+# -----------------------------------------------------------------------------
+# 三档等级定义
+# -----------------------------------------------------------------------------
+scales:
+
+  # =========================================================================
+  # light —— 轻量需求
+  # =========================================================================
+  - id: light
+    name_cn: 轻量
+    description: 单页面/单功能/无外部依赖/PM 明确说"小需求"
+    judgement:
+      rules:
+        - id: single_page_or_feature
+          description: "单页面/单功能"
+          weight: 1
+        - id: no_external_dep
+          description: "无外部依赖"
+          weight: 1
+        - id: pm_explicit_small
+          description: "PM 明确说'小需求'/'轻量'"
+          weight: 1
+      min_match: 1  # 满足任意 1 条即可（v2.0 放宽，原 v1.0 是 2 条）
+    participants: [libu, bingbu, hubu, menxia, shangshu]
+    skipped: [libu_compliance, gongbu, xingbu]
+    review_rounds: 1
+    output_diffs:
+      persona_count: { min: 1 }
+      scenario_count: { min: 1 }
+      fr_format: "table"
+      state_machine: optional
+      competitor_count: { min: 0 }
+      prototype: skipped
+      testing: skipped
+      plan_review_gate: skipped
+    source: workflow/_archive/contracts.v1.md#l14-17
+
+  # =========================================================================
+  # standard —— 标准需求（默认）
+  # =========================================================================
+  - id: standard
+    name_cn: 标准
+    description: 不符合 light 和 complex 的默认配置
+    judgement:
+      rules: []
+      is_default: true
+    participants: [libu, bingbu, hubu, libu_compliance, gongbu, menxia, shangshu]
+    skipped: []
+    review_rounds: 2
+    output_diffs:
+      persona_count: { min: 2 }
+      scenario_count: { min: 2 }
+      fr_format: "table_with_priority"
+      state_machine: required
+      competitor_count: { min: 1 }
+      prototype: low_fidelity
+      testing: gongbu_self_test
+      plan_review_gate: required
+    source: workflow/_archive/contracts.v1.md#l18
+
+  # =========================================================================
+  # complex —— 复杂需求
+  # =========================================================================
+  - id: complex
+    name_cn: 复杂
+    description: 跨多端/涉及支付或政府许可/PM 说"大项目"
+    judgement:
+      rules:
+        - id: multi_platform
+          description: "跨多端（用户端+运营端+管理端）"
+          weight: 1
+        - id: payment_or_compliance
+          description: "涉及第三方支付/实名认证/政府许可"
+          weight: 1
+        - id: pm_explicit_large
+          description: "PM 说'大项目/战略级'"
+          weight: 1
+      min_match: 1
+    participants: [libu, bingbu, hubu, libu_compliance, gongbu, xingbu, menxia, shangshu]
+    additional_gates: [strategy_gate]
+    review_rounds: 3
+    output_diffs:
+      persona_count: { min: 3 }
+      scenario_count: { min: 3 }
+      fr_format: "table_with_priority_and_id"
+      state_machine: { required: true, with_abnormal: true }
+      competitor_count: { min: 2 }
+      prototype: { fidelity: low, with_animation: true }
+      testing: independent_xingbu
+      plan_review_gate: required
+    source: workflow/_archive/contracts.v1.md#l19-21
+
+# -----------------------------------------------------------------------------
+# 等级变更流程（v2.0 新增，解决原缺失问题）
+# -----------------------------------------------------------------------------
+change_procedures:
+
+  # =========================================================================
+  # 升级（light → standard → complex）
+  # =========================================================================
+  promotion:
+    description: 需求规模超出当前等级时升级
+    trigger_conditions:
+      - "实施中发现复杂度超出预期"
+      - "reviewer审核时判定当前等级不足以覆盖所有契约"
+      - "PM 主动说'升级到 X'"
+    flow:
+      - "1. 触发者（reviewer/原型/PM）向supervisor提交'等级变更申请'"
+      - "2. supervisor更新 state.json 的 scale 字段"
+      - "3. 补跑原被跳过 Agent 的产出（如合规合规、原型原型、审计测试）"
+      - "4. 重走reviewer审核（重新计 review_rounds）"
+    limits:
+      - "complex 不能再升级（已是最高级）"
+    state_field: scale
+    update_method: |
+      jq --arg s "${new_scale}" '.scale = $s | .updated = (now | todate)' state.json > state.json.tmp && mv state.json.tmp state.json
+      git commit -m "scale promotion: ${req_id} ${old_scale} → ${new_scale}" --escalated
+
+  # =========================================================================
+  # 降级（complex → standard → light）
+  # =========================================================================
+  demotion:
+    description: 需求规模被高估时降级
+    trigger_conditions:
+      - "PM 主动说'简化'/PM 确认范围收窄"
+      - "reviewer审核时发现实际复杂度低于当前等级"
+    flow:
+      - "1. 触发者提交降级申请"
+      - "2. supervisor与 PM 确认范围（避免遗漏必要 Agent）"
+      - "3. 更新 state.json 的 scale 字段"
+      - "4. 保留已产出 Agent 的产出，标记'超出当前等级'但归档保留"
+    limits:
+      - "已经产出但当前等级不需要的产物，不删除（归档到 归档需求产出/_overproduced/）"
+    state_field: scale
+
+  # =========================================================================
+  # 等级争议仲裁（v2.0 新增）
+  # =========================================================================
+  dispute_arbitration:
+    description: reviewer与起草 Agent 对等级判定有分歧时如何处理
+    flow:
+      - "1. reviewer在 review.md 中标记 DISPUTE: scale"
+      - "2. supervisor收集双方论据（最多 2 轮）"
+      - "3. supervisor基于 rules.min_match 给推荐等级"
+      - "4. PM 仲裁（'升 X'/'降 X'/'维持'）"
+      - "5. 仲裁结果记入 state.json 的 scale_dispute_history"
+    arbitration_owner: PM
+    fallback: |
+      若 PM 不回应超过 24h，supervisor按"宁高不低"原则
+      采用更高一档的等级（避免契约覆盖不足）
+
+# -----------------------------------------------------------------------------
+# 等级判定辅助（PM 触发时快速给出建议）
+# -----------------------------------------------------------------------------
+quick_judge_prompt: |
+  supervisor在 PM 说"开始新需求：XXX"后，按以下顺序询问：
+  1. "这个需求跨几端？"（1端 → light；2端 → standard；3端及以上 → complex）
+  2. "是否涉及支付/实名/政府许可？"（是 → complex）
+  3. "PM 自己觉得是大项目吗？"（是 → complex；否 → 按上面两条判定）
+
+  默认值：standard（兜底）

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#F5F6FA;--card:#FFF;--line:#E5E7EB;--t1:#111827;--t2:#6B7280;--t3:#9CA3AF;--pri:#2563EB;--pri-h:#3B82F6;--pri-bg:#EFF6FF;--ok:#22C55E;--ok-bg:#F0FDF4;--warn:#F59E0B;--warn-bg:#FFFBEB;--danger:#EF4444;--danger-bg:#FEF2F2;--purple:#8B5CF6;--pink:#EC4899;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-pill:9999px}
+html,body{background:#E5E7EB;color:var(--t1);font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+body{padding:0;margin:0;display:flex;justify-content:center;align-items:flex-start}
+.deck{display:flex;flex-direction:column;align-items:center;gap:0;padding:0}
+.card{width:750px !important;height:auto !important;min-height:0 !important;max-height:none !important;overflow:visible !important;background:var(--card);border-radius:var(--r-lg);box-shadow:0 10px 30px rgba(0,0,0,.08);padding:36px 40px;display:flex;flex-direction:column;margin:24px auto;position:relative}
+.num{position:absolute;top:20px;right:24px;font-size:11px;color:var(--t3);font-weight:600;letter-spacing:1px}
+.brand{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.brand .logo{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#2563EB,#8B5CF6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.brand .name{font-size:13px;font-weight:600}
+.brand .tag{font-size:10px;background:#F3F4F6;color:var(--t2);padding:2px 7px;border-radius:var(--r-pill)}
+.title{margin-bottom:8px}
+.title h1{font-size:32px;font-weight:700;line-height:1.2;letter-spacing:-.5px;margin-bottom:6px}
+.title h1 .em{color:var(--pri)}
+.title p{font-size:13px;color:var(--t2);line-height:1.6}
+.gate{display:flex;gap:14px;align-items:flex-start;padding:14px;margin:10px 0;border-radius:var(--r-md);border:1.5px solid var(--warn);background:var(--warn-bg)}
+.gate .num{flex:0 0 50px;width:50px;height:50px;border-radius:50%;background:var(--warn);color:#fff;font-size:24px;font-weight:700;display:flex;align-items:center;justify-content:center;position:static}
+.gate .body{flex:1;min-width:0}
+.gate .body h3{font-size:14px;font-weight:700;color:#92400E;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.gate .body p{font-size:12px;color:var(--t1);line-height:1.6}
+.gate .body .decide{font-size:11px;background:#fff;border:1px solid var(--line);padding:6px 10px;border-radius:var(--r-sm);margin-top:6px;color:var(--t2)}
+.gate .body .decide b{color:var(--t1);font-weight:600}
+.footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.footer .credit{font-size:10px;color:var(--t3)}
+.footer .next{font-size:11px;color:var(--pri);font-weight:600}
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="card" id="card-7">
+  <div class="num">07 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">v7.0.0</span>
+  </div>
+  <div class="title"><h1>你只用在 <span class="em">4 个门</span> 上</h1><p>v5.1 的 9 道门（5 硬 + 4 软）→ v7.0.0 的 <b style="color:var(--warn)">≤ 4 次打断</b></p></div>
+
+  <div class="gate">
+    <div class="num">1</div>
+    <div class="body">
+      <h3>门 1 · 场景与旅程</h3>
+      <p>④ 后。场景卡 + 故事地图 + 旅程图是否对齐用户真实痛点？</p>
+      <div class="decide"><b>决策：</b>通过 → ⑤ 功能设计 / 打回补充 / 改范围回 ①</div>
+    </div>
+  </div>
+
+  <div class="gate">
+    <div class="num">2</div>
+    <div class="body">
+      <h3>门 2 · 功能表与方案</h3>
+      <p>⑤ 后。RICE 优先级 + 指标基线 + 合规审查是否闭环？</p>
+      <div class="decide"><b>决策：</b>通过 → ⑥ 低保真 / 打回补充</div>
+    </div>
+  </div>
+
+  <div class="gate">
+    <div class="num">3</div>
+    <div class="body">
+      <h3>门 3 · 原型</h3>
+      <p>⑥ 后。截图+交互是否能支撑 §6 功能说明？</p>
+      <div class="decide"><b>决策：</b>通过 → ⑦ 高保真 + PRD / 改标注回 ⑥</div>
+    </div>
+  </div>
+
+  <div class="gate">
+    <div class="num">4</div>
+    <div class="body">
+      <h3>门 4 · 交付验收</h3>
+      <p>⑧ 后。机器门 + 宪法 8 条 + 来源标注是否全部通过？</p>
+      <div class="decide"><b>决策：</b>通过 → 归档到 <code>需求产出/</code> / 打回补充</div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px;padding:10px 14px;background:linear-gradient(135deg,#EFF6FF,#EDE9FE);border-radius:8px;font-size:12px;line-height:1.6">
+    <b>机器门自动跑</b>（不占打断次数）：<code style="color:var(--pri);font-family:ui-monospace,Menlo,monospace">validate_contract.py</code> 在 ⑦ 末与 ⑧ 自动触发，20 条 guardrail + spec 质量门逐项校验。
+  </div>
+
+  <div class="footer">
+    <span class="credit">v7.0.0 4 人工门 + 机器门自动跑</span>
+    <span class="next">→ 下一张：怎么跑起来</span>
+  </div>
+</div>
+</div>
+</body>
+</html>

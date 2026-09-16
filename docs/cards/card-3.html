@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#F5F6FA;--card:#FFF;--line:#E5E7EB;--t1:#111827;--t2:#6B7280;--t3:#9CA3AF;--pri:#2563EB;--pri-h:#3B82F6;--pri-bg:#EFF6FF;--ok:#22C55E;--ok-bg:#F0FDF4;--warn:#F59E0B;--warn-bg:#FFFBEB;--danger:#EF4444;--danger-bg:#FEF2F2;--purple:#8B5CF6;--pink:#EC4899;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-pill:9999px}
+html,body{background:#E5E7EB;color:var(--t1);font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+body{padding:0;margin:0;display:flex;justify-content:center;align-items:flex-start}
+.deck{display:flex;flex-direction:column;align-items:center;gap:0;padding:0}
+.card{width:750px !important;height:auto !important;min-height:0 !important;max-height:none !important;overflow:visible !important;background:var(--card);border-radius:var(--r-lg);box-shadow:0 10px 30px rgba(0,0,0,.08);padding:36px 40px;display:flex;flex-direction:column;margin:24px auto;position:relative}
+.num{position:absolute;top:20px;right:24px;font-size:11px;color:var(--t3);font-weight:600;letter-spacing:1px}
+.brand{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.brand .logo{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#2563EB,#8B5CF6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.brand .name{font-size:13px;font-weight:600}
+.brand .tag{font-size:10px;background:#F3F4F6;color:var(--t2);padding:2px 7px;border-radius:var(--r-pill)}
+.title{margin-bottom:8px}
+.title h1{font-size:32px;font-weight:700;line-height:1.2;letter-spacing:-.5px;margin-bottom:6px}
+.title h1 .em{color:var(--pri)}
+.title p{font-size:13px;color:var(--t2);line-height:1.6}
+.scale{display:flex;gap:12px;margin:14px 0}
+.scale .col{flex:1;border:1px solid var(--line);border-radius:var(--r-md);padding:14px;background:var(--card)}
+.scale .col.pri{background:linear-gradient(135deg,#EFF6FF,#EDE9FE);border-color:var(--pri)}
+.scale h3{font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+.scale h3 .badge{font-size:9px;background:#F3F4F6;color:var(--t2);padding:2px 6px;border-radius:var(--r-pill);font-weight:600}
+.scale .col.pri h3 .badge{background:#2563EB;color:#fff}
+.scale .role{font-size:11px;color:var(--t2);margin-bottom:8px;font-family:ui-monospace,Menlo,monospace}
+.scale .who{font-size:12px;color:var(--t1);line-height:1.5;margin-bottom:8px}
+.scale ul{list-style:none;font-size:12px;line-height:1.7;color:var(--t2)}
+.scale li::before{content:"·";color:var(--pri);font-weight:700;margin-right:6px}
+.scale .col.pri li::before{color:var(--pri)}
+.footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.footer .credit{font-size:10px;color:var(--t3)}
+.footer .next{font-size:11px;color:var(--pri);font-weight:600}
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="card" id="card-3">
+  <div class="num">03 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">v7.0.0</span>
+  </div>
+  <div class="title"><h1>选哪个 <span class="em">规模</span>？</h1><p>3 规模 × 1 个正交开关 <code>deliver_code</code></p></div>
+
+  <div class="scale">
+    <div class="col">
+      <h3>lightweight <span class="badge">小修</span></h3>
+      <div class="role">3 角色 · 3 阶段</div>
+      <div class="who">小修改 / 明确需求</div>
+      <ul>
+        <li>跳过 ②③ 调研</li>
+        <li>只产低保真</li>
+        <li>简版 PRD</li>
+      </ul>
+    </div>
+    <div class="col pri">
+      <h3>standard <span class="badge">默认</span></h3>
+      <div class="role">13 角色 · 全流程</div>
+      <div class="who">常规需求（80%）</div>
+      <ul>
+        <li>②③ 串行调研</li>
+        <li>低 + 高保真</li>
+        <li>完整 14 模块 PRD</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3>complex <span class="badge">战略</span></h3>
+      <div class="role">13+3 角色 · KG 追溯</div>
+      <div class="who">大范围 / 涉及战略</div>
+      <ul>
+        <li>②③ 深度对比</li>
+        <li>KG 必填</li>
+        <li>反例防模板污染</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin-top:14px;padding:12px 14px;background:#F9FAFB;border-radius:8px;border:1px solid var(--line)">
+    <div style="font-size:12px;font-weight:600;margin-bottom:4px">正交开关 <code style="color:var(--pri);font-family:ui-monospace,Menlo,monospace">deliver_code</code></div>
+    <div style="font-size:12px;color:var(--t2);line-height:1.6"><b style="color:var(--ok)">false</b>（默认）= 止于 PRD + 原型，不改任何代码；<b style="color:var(--warn)">true</b> = 继续实施改造 + 测试报告（高风险）</div>
+  </div>
+
+  <div class="footer">
+    <span class="credit">v5.1 的 3 mode（lean_pm/standard/enhanced）→ v7.0.0 的 3 规模 × 开关</span>
+    <span class="next">→ 下一张：谁在干活</span>
+  </div>
+</div>
+</div>
+</body>
+</html>

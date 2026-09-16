@@ -1,0 +1,11 @@
+_type: Guardrail
+id: g007
+name: 无反问句
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "正则匹配 ? 结尾的反问句（排除代码示例）"
+source: workflow/_archive/contracts.v1.md#L71
+created: 2026-07-03
+status: active
+notes: "开放问题统一放文件末尾 ## 开放问题 章节"

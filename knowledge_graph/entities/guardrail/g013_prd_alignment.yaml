@@ -1,0 +1,10 @@
+_type: Guardrail
+id: g013
+name: 原型-实施对齐契约
+category: universal
+severity: P0
+applies_to: [gongbu, menxia]
+check_pattern: "原型每个交互元素必须在 final_prd.md 有对应功能说明"
+source: workflow/_archive/contracts.v1.md#L77
+created: 2026-07-03
+status: active

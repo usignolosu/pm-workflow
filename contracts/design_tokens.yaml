@@ -1,0 +1,97 @@
+# 设计 Token（v6.0 · P3-1，借鉴 v0/设计 token 生态）
+# =========================================================================
+# 原型 specialist 生成 HTML 前必须读本文件并引用 token；
+# reviewer 机械化检查：HTML/产出中出现不在 primitive 层的硬编码色值 → 打回（Guardrail g015）
+# 格式参考 W3C Design Tokens 标准：primitive → semantic → component 三层
+# =========================================================================
+
+_version: "1.0.0"
+_source: "v5.1 工作流对标报告 P3-1"
+
+# -----------------------------------------------------------------------------
+# 第 1 层：primitive（原始值，唯一定义处）
+# -----------------------------------------------------------------------------
+primitive:
+  color:
+    gray-50: "#F9FAFB"
+    gray-100: "#F3F4F6"
+    gray-300: "#D1D5DB"
+    gray-500: "#6B7280"
+    gray-700: "#374151"
+    gray-900: "#111827"
+    blue-500: "#3B82F6"
+    blue-600: "#2563EB"
+    green-500: "#22C55E"
+    red-500: "#EF4444"
+    amber-500: "#F59E0B"
+  font-size:
+    xs: "12px"
+    sm: "14px"
+    base: "16px"
+    lg: "18px"
+    xl: "24px"
+    xxl: "32px"
+  spacing:
+    xs: "4px"
+    sm: "8px"
+    md: "16px"
+    lg: "24px"
+    xl: "32px"
+    xxl: "48px"
+  radius:
+    sm: "4px"
+    md: "8px"
+    lg: "12px"
+    full: "9999px"
+
+# -----------------------------------------------------------------------------
+# 第 2 层：semantic（语义别名，原型中优先用这层）
+# -----------------------------------------------------------------------------
+semantic:
+  color:
+    surface: "gray-50"        # 页面背景
+    card: "#FFFFFF"           # 卡片背景（white 例外，允许直接用）
+    text-primary: "gray-900"
+    text-secondary: "gray-500"
+    border: "gray-300"
+    primary: "blue-600"       # 主操作
+    primary-hover: "blue-500"
+    success: "green-500"
+    danger: "red-500"
+    warning: "amber-500"
+  radius:
+    button: "md"
+    card: "lg"
+    avatar: "full"
+
+# -----------------------------------------------------------------------------
+# 第 3 层：component（组件级约定）
+# -----------------------------------------------------------------------------
+component:
+  button:
+    height: "36px"
+    padding: "sm md"
+    radius: "radius.button"
+  card:
+    padding: "lg"
+    radius: "radius.card"
+  input:
+    height: "36px"
+    radius: "radius.sm"
+
+# -----------------------------------------------------------------------------
+# 使用与校验规则
+# -----------------------------------------------------------------------------
+rules:
+  usage: |
+    原型 HTML 的 CSS 中颜色/字号/间距/圆角必须引用本文件或其 CSS 变量；
+    semantic 层优先于 primitive 层直接使用。
+  exceptions:
+    - "#FFFFFF / white —— 卡片/画布背景"
+    - "transparent / currentColor"
+  violation: |
+    出现本文件 primitive.color 之外的 hex 色值（且不在 exceptions 内）= 打回，
+    由 Guardrail g015 机械检查。
+  customization: |
+    各 REQ 如需品牌色，在 REQ 目录放 design_tokens_override.yaml 覆盖 primitive 层，
+    禁止绕过 token 直接写色值。

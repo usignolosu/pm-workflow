@@ -1,0 +1,12 @@
+_type: Guardrail
+id: g103
+name: 指标-验收标准可量化
+category: agent_specific
+agent: hubu
+severity: P0
+check_pattern: "验收标准不得使用主观判词，必须可量化"
+source: workflow/_archive/contracts.v1.md#L85
+created: 2026-07-03
+status: active
+example_pass: "接口响应时间 < 200ms"
+example_fail: "响应要快"

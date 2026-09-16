@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#F5F6FA;--card:#FFF;--line:#E5E7EB;--t1:#111827;--t2:#6B7280;--t3:#9CA3AF;--pri:#2563EB;--pri-h:#3B82F6;--pri-bg:#EFF6FF;--ok:#22C55E;--ok-bg:#F0FDF4;--warn:#F59E0B;--warn-bg:#FFFBEB;--danger:#EF4444;--danger-bg:#FEF2F2;--purple:#8B5CF6;--pink:#EC4899;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-pill:9999px}
+html,body{background:#E5E7EB;color:var(--t1);font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+body{padding:0;margin:0;display:flex;justify-content:center;align-items:flex-start}
+.deck{display:flex;flex-direction:column;align-items:center;gap:0;padding:0}
+.card{width:750px !important;height:auto !important;min-height:0 !important;max-height:none !important;overflow:visible !important;background:var(--card);border-radius:var(--r-lg);box-shadow:0 10px 30px rgba(0,0,0,.08);padding:36px 40px;display:flex;flex-direction:column;margin:24px auto;position:relative}
+.num{position:absolute;top:20px;right:24px;font-size:11px;color:var(--t3);font-weight:600;letter-spacing:1px}
+.brand{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.brand .logo{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#2563EB,#8B5CF6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.brand .name{font-size:13px;font-weight:600}
+.brand .tag{font-size:10px;background:#F3F4F6;color:var(--t2);padding:2px 7px;border-radius:var(--r-pill)}
+.title{margin-bottom:8px}
+.title h1{font-size:32px;font-weight:700;line-height:1.2;letter-spacing:-.5px;margin-bottom:6px}
+.title h1 .em{color:var(--pri)}
+.title p{font-size:13px;color:var(--t2);line-height:1.6}
+.role{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.role:last-child{border-bottom:0}
+.avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0}
+.role .info{flex:1;min-width:0}
+.role .name{font-size:13px;font-weight:600;margin-bottom:1px;display:flex;align-items:center;gap:6px}
+.role .what{font-size:11px;color:var(--t2);line-height:1.5}
+.role .when{font-size:10px;color:var(--pri);font-family:ui-monospace,Menlo,monospace;font-weight:600;background:var(--pri-bg);padding:2px 6px;border-radius:var(--r-pill);flex-shrink:0}
+.ext{display:inline-block;font-size:9px;font-weight:600;padding:1px 6px;border-radius:var(--r-pill);background:#EDE9FE;color:#5B21B6;margin-left:4px}
+.legend{display:flex;gap:8px;margin-top:10px;font-size:11px;color:var(--t2)}
+.legend .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.footer .credit{font-size:10px;color:var(--t3)}
+.footer .next{font-size:11px;color:var(--pri);font-weight:600}
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="card" id="card-4">
+  <div class="num">04 / 08</div>
+  <div class="brand">
+    <div class="logo">工</div>
+    <div class="name">产品自动化工作流</div>
+    <span class="tag">v7.0.0</span>
+  </div>
+  <div class="title"><h1>谁在帮你 <span class="em">干活</span>？</h1><p>13 常驻角色 + 3 复杂扩展 · 每个阶段都有专属专家</p></div>
+
+  <div class="role">
+    <div class="avatar" style="background:#2563EB">编</div>
+    <div class="info"><div class="name">主编排</div><div class="what">全程调度 / 状态机 / 归档</div></div>
+    <div class="when">全程</div>
+  </div>
+  <div class="role">
+    <div class="avatar" style="background:#0EA5E9">调</div>
+    <div class="info"><div class="name">调研员 + 行业分析 + 用例转写</div><div class="what">代码走查 + 联网竞品 + 转写标准用例</div></div>
+    <div class="when">②③</div>
+  </div>
+  <div class="role">
+    <div class="avatar" style="background:#8B5CF6">研</div>
+    <div class="info"><div class="name">用户研究</div><div class="what">画像 + 场景卡 + 故事地图 + 旅程图</div></div>
+    <div class="when">④</div>
+  </div>
+  <div class="role">
+    <div class="avatar" style="background:#EC4899">设</div>
+    <div class="info"><div class="name">功能设计 + 指标 + 合规</div><div class="what">RICE 排序 + 北极星指标 + 合规审查</div></div>
+    <div class="when">⑤</div>
+  </div>
+  <div class="role">
+    <div class="avatar" style="background:#F59E0B">原</div>
+    <div class="info"><div class="name">策略风控 + 原型</div><div class="what">边界 + 降级链 + 低保真/高保真 HTML</div></div>
+    <div class="when">⑥⑦</div>
+  </div>
+  <div class="role">
+    <div class="avatar" style="background:#10B981">测</div>
+    <div class="info"><div class="name">测试 + PRD</div><div class="what">测试用例集 + 14 模块 PRD</div></div>
+    <div class="when">⑦</div>
+  </div>
+  <div class="role">
+    <div class="avatar" style="background:#EF4444">评</div>
+    <div class="info"><div class="name">评审 critic + QA <span class="ext">双岗</span></div><div class="what">中途打回 / 终审 + 来源标注</div></div>
+    <div class="when">⑥⑦⑧</div>
+  </div>
+
+  <div style="margin-top:12px;padding:10px 12px;background:#F9FAFB;border-radius:8px;border:1px solid var(--line);font-size:12px;color:var(--t2);line-height:1.6">
+    <b style="color:var(--t1)">复杂扩展（仅 complex 规模激活）：</b>
+    <span style="margin-left:8px">法律顾问 / 资深架构师 / 用户研究员</span>
+  </div>
+
+  <div class="footer">
+    <span class="credit">v5.1 三省六部 8 agent → v7.0.0 13 常驻 + 3 扩展</span>
+    <span class="next">→ 下一张：什么时候干活</span>
+  </div>
+</div>
+</div>
+</body>
+</html>

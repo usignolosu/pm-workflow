@@ -1,0 +1,11 @@
+_type: Guardrail
+id: g101
+name: 用户研究-画像来源标注
+category: agent_specific
+agent: libu
+severity: P0
+check_pattern: "画像必须有来源标注"
+source: workflow/_archive/contracts.v1.md#L83
+created: 2026-07-03
+status: active
+legal_values: [基于需求推断, 基于通用行业认知, 基于用户调研假设]

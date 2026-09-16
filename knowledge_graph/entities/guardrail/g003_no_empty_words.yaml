@@ -1,0 +1,11 @@
+_type: Guardrail
+id: g003
+name: 不得写空话
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "黑名单匹配：体验流畅/提升效率/简单易用/快速响应/稳定可靠"
+source: workflow/_archive/contracts.v1.md#L67
+created: 2026-07-03
+status: active
+notes: "每个定性描述必须附可判断条件"

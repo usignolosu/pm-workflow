@@ -1,0 +1,359 @@
+# 上下文装载顺序（Load Order）—— 唯一权威源
+# =========================================================================
+# 解决原 contracts.md §2 与 §4 重复定义的问题
+# 此处为 8 个 Agent 的 Load Order 唯一权威源
+# =========================================================================
+
+_version: "2.0.0"
+
+# -----------------------------------------------------------------------------
+# 前置装载（pre_load，v4.0 新增）：所有 Agent 在各自 order 之前必读
+# -----------------------------------------------------------------------------
+pre_load:
+  - path: "contracts/constitution.yaml"
+    description: "项目宪法：8 条需求无关的产品原则红线（借鉴 Spec Kit constitution）"
+    required: true
+
+# -----------------------------------------------------------------------------
+# 按需注入（injection_rules，v6.0 P1-2，借鉴 Agent OS：不全量塞 context）
+# -----------------------------------------------------------------------------
+injection_rules:
+  principle: |
+    specialist 只加载与本次任务相关的标准/模板/上游产物段落，而非全量文件。
+    supervisor 调度时按下面三档裁剪；上下文预算：单次调度 ≤ 8k token。
+  tiers:
+    light: "只注入：任务指令（对应角色 SKILL 的角色段）+ 直接上游产出摘要"
+    standard: "light + guardrails 通用段 + spec_checklist（reviewer）+ design_tokens（原型）"
+    complex: "standard + 完整 SKILL + constitution 对照 + 相关 KG 实体全文"
+  rules:
+    - "SKILL.md 的共享段（Guardrails/Scale/Load Order）在 light/standard 档只注入标题级摘要"
+    - "上游产物超过 300 行时注入：目录 + 各章首段 + 与本 specialist 职能相关的章节"
+    - " Constitution 按 REQ 类型注入相关条目：涉及数据/外部接口 → c001/c002；涉及计算 → c003；涉及 UI → c004/c005"
+
+# -----------------------------------------------------------------------------
+# 装载步骤类型
+# -----------------------------------------------------------------------------
+step_types:
+  kg_query:
+    description: "查知识图谱（v2.0 新增，所有 Agent 第 0 步）"
+    required_for_scale: [standard, complex]
+  file_read:
+    description: "读上游产物或契约文件"
+  script:
+    description: "执行辅助脚本（如自动校验）"
+
+# -----------------------------------------------------------------------------
+# 各 Agent Load Order
+# -----------------------------------------------------------------------------
+agents:
+
+  # ===========================================================================
+  # 用户研究（libu / user_research）
+  # ===========================================================================
+  - id: libu
+    name_cn: 用户研究
+    name_en: user_research
+    order:
+      - step: 0
+        type: kg_query
+        description: 查知识图谱获取同 scale 同领域的历史 Persona/Scenario
+        script: "scripts/query_kg.py --type persona,scenario,insight --scale ${scale}"
+        optional: false
+      - step: 1
+        type: file_read
+        path: "归档需求产出/${req_id}/01_drafted/initial_request.md"
+        description: "PM 原始需求"
+        required: true
+      - step: 2
+        type: file_read
+        path: "contracts/schema/guardrails.yaml"
+        description: "重点读通用防线 g001-g014 + 专用防线 g101"
+        required: true
+
+  # ===========================================================================
+  # 战略（bingbu / strategy_risk）
+  # ===========================================================================
+  - id: bingbu
+    name_cn: 战略
+    name_en: strategy_risk
+    order:
+      - step: 0
+        type: kg_query
+        description: 查历史 FR / StateMachine 模板
+        script: "scripts/query_kg.py --type fr,state_machine --scale ${scale}"
+        optional: false
+      - step: 1
+        type: file_read
+        path: "归档需求产出/${req_id}/01_drafted/01_user_research.md"
+        description: "用户研究产出"
+        required: true
+      - step: 2
+        type: file_read
+        path: "归档需求产出/${req_id}/01_drafted/initial_request.md"
+        description: "PM 原始需求"
+        required: true
+      - step: 3
+        type: file_read
+        path: "contracts/schema/guardrails.yaml"
+        description: "重点读通用防线 + 专用防线 g102"
+        required: true
+
+  # ===========================================================================
+  # 指标（hubu / metrics_value）
+  # ===========================================================================
+  - id: hubu
+    name_cn: 指标
+    name_en: metrics_value
+    order:
+      - step: 0
+        type: kg_query
+        description: 查历史 Metric 模板
+        script: "scripts/query_kg.py --type metric --scale ${scale}"
+        optional: false
+      - step: 1
+        type: file_read
+        path: "归档需求产出/${req_id}/01_drafted/02_strategy_and_risk.md"
+        description: "战略产出"
+        required: true
+      - step: 2
+        type: file_read
+        path: "归档需求产出/${req_id}/01_drafted/01_user_research.md"
+        description: "用户研究产出（可选读，用于交叉验证画像）"
+        required: false
+      - step: 3
+        type: file_read
+        path: "contracts/schema/guardrails.yaml"
+        description: "重点读通用防线 + 专用防线 g103"
+        required: true
+
+  # ===========================================================================
+  # 合规（libu_compliance / compliance）
+  # ===========================================================================
+  - id: libu_compliance
+    name_cn: 合规
+    name_en: compliance
+    order:
+      - step: 0
+        type: kg_query
+        description: 查合规规则库（按行业）
+        script: "scripts/query_kg.py --type compliance_rule --industry ${industry}"
+        optional: false
+      - step: 1
+        type: file_read
+        path: "归档需求产出/${req_id}/01_drafted/02_strategy_and_risk.md"
+        description: "战略产出"
+        required: true
+      - step: 2
+        type: file_read
+        path: "归档需求产出/${req_id}/01_drafted/03_metrics_and_value.md"
+        description: "指标产出"
+        required: true
+      - step: 3
+        type: file_read
+        path: "归档需求产出/${req_id}/01_drafted/01_user_research.md"
+        description: "用户研究产出"
+        required: true
+      - step: 4
+        type: file_read
+        path: "contracts/schema/guardrails.yaml"
+        description: "重点读通用防线 + 专用防线 g104"
+        required: true
+
+  # ===========================================================================
+  # 原型（gongbu / engineering）—— 多角色
+  # ===========================================================================
+  - id: gongbu
+    name_cn: 原型
+    name_en: engineering
+    roles: [A1_solution, A2_prototype, A3_screenshot, B_dev]
+    role_specific_load_orders:
+      A1_solution:
+        order:
+          - step: 0
+            type: kg_query
+            description: 查技术组件库（按 category）
+            script: "scripts/query_kg.py --type tech_component --category ${category}"
+            optional: false
+          - step: 1
+            type: file_read
+            path: "归档需求产出/${req_id}/01_drafted/0[1-4]_*.md"
+            description: "所有上游产物（01_user_research ~ 04_compliance）"
+            required: true
+          - step: 2
+            type: file_read
+            path: "contracts/schema/guardrails.yaml"
+            description: "重点读通用防线 + 专用防线 g105"
+            required: true
+      A2_prototype:
+        order:
+          - step: 1
+            type: file_read
+            path: "归档需求产出/${req_id}/03_finalized/final_prd.md"
+            description: "supervisor合并的最终 PRD"
+            required: true
+          - step: 2
+            type: file_read
+            path: "归档需求产出/${req_id}/01_drafted/05_solution.md"
+            description: "原型-A1 技术方案"
+            required: true
+      A3_screenshot:
+        order:
+          - step: 1
+            type: file_read
+            path: "归档需求产出/${req_id}/01_drafted/prototype/"
+            description: "A2 产出原型 HTML"
+            required: true
+          - step: 2
+            type: file_read
+            path: "归档需求产出/${req_id}/03_finalized/final_prd.md"
+            description: "PRD 用于对照标注"
+            required: true
+      B_dev:
+        order:
+          - step: 1
+            type: file_read
+            path: "归档需求产出/${req_id}/03_finalized/final_prd.md"
+            description: "PRD（含截图+标注）"
+            required: true
+          - step: 2
+            type: file_read
+            path: "归档需求产出/${req_id}/01_drafted/prototype/"
+            description: "原型 HTML"
+            required: true
+
+  # ===========================================================================
+  # 审计（xingbu / audit_logic）—— 多角色
+  # ===========================================================================
+  - id: xingbu
+    name_cn: 审计
+    name_en: audit_logic
+    roles: [A_logic_audit, B_testing]
+    role_specific_load_orders:
+      A_logic_audit:
+        order:
+          - step: 0
+            type: kg_query
+            description: 查历史 Lesson（已知缺陷模式）
+            script: "scripts/query_kg.py --type lesson"
+            optional: false
+          - step: 1
+            type: file_read
+            path: "归档需求产出/${req_id}/01_drafted/0[1-6]_*.md"
+            description: "所有上游产物"
+            required: true
+          - step: 2
+            type: file_read
+            path: "contracts/schema/guardrails.yaml"
+            description: "重点读通用防线 + 专用防线 g107"
+            required: true
+      B_testing:
+        order:
+          - step: 1
+            type: file_read
+            path: "归档需求产出/${req_id}/03_finalized/final_prd.md"
+            description: "PRD"
+            required: true
+          - step: 2
+            type: file_read
+            path: "归档需求产出/${req_id}/03_finalized/implementation/code/"
+            description: "原型研发代码"
+            required: true
+
+  # ===========================================================================
+  # reviewer（menxia / critic）—— v2.0 加自动校验
+  # ===========================================================================
+  - id: menxia
+    name_cn: reviewer
+    name_en: critic
+    order:
+      - step: 0
+        type: script
+        description: 必走契约自动校验（v2.0 新增）
+        command: "python scripts/validate_contract.py --req ${req_id} --agent all --strictness ${strictness}"
+        required: true
+        note: |
+          若 exit code = 2（fail）：把所有 P0 违规原样写进 review.md 的 `## 必须修改` 段
+          若 exit code = 0（pass）：继续 Step 1
+          若 exit code = 1（warn）：继续 Step 1，但把 WARN 写进 `## 建议优化`
+      - step: 1
+        type: file_read
+        path: "归档需求产出/${req_id}/03_finalized/prd.md"
+        description: "supervisor合并的完整 PRD"
+        required: true
+      - step: 2
+        type: file_read
+        path: "contracts/schema/guardrails.yaml"
+        description: "重点读 P0 必打回清单"
+        required: true
+      - step: 3
+        type: file_read
+        path: "归档需求产出/${req_id}/01_drafted/0[1-6]_*.md"
+        description: "用于深度验证"
+        optional: true
+
+  # ===========================================================================
+  # supervisor（shangshu / dispatcher）
+  # ===========================================================================
+  - id: shangshu
+    name_cn: supervisor
+    name_en: dispatcher
+    order:
+      - step: 0
+        type: file_read
+        path: "state.json"
+        description: "全局状态锁（含 scale、phase、step）"
+        required: true
+      - step: 1
+        type: file_read
+        path: "contracts/README.md"
+        description: "契约入口"
+        required: true
+      - step: 2
+        type: file_read
+        path: "归档需求产出/${req_id}/01_drafted/0[1-3]_*/"
+        description: "对应阶段产物"
+        required: true
+      - step: 3
+        type: file_read
+        path: "feedback_log/shangshu/"
+        description: "最近 PM 反馈（用于反省）"
+        optional: true
+
+# -----------------------------------------------------------------------------
+# 装载顺序硬约束
+# -----------------------------------------------------------------------------
+hard_constraints:
+  description: "违反以下任一约束视为跳级（违反 Guardrail #g005）"
+  rules:
+    - "bingbu 必须先读到 libu 的 01_user_research.md"
+    - "hubu 必须先读到 bingbu 的 02_strategy_and_risk.md"
+    - "libu_compliance 必须先读到 bingbu + hubu 的产出"
+    - "gongbu (A1) 必须先读到 libu + bingbu + hubu + libu_compliance 的全部产出"
+    - "xingbu (A) 必须先读到所有 01_~05_ 上游产出"
+    - "gongbu (A2) 必须先读到 gongbu (A1) 的 05_solution.md"
+    - "gongbu (B) 必须先读到 final_prd.md + prototype/"
+    - "menxia 必须先跑 validate_contract.py"
+    - "shangshu 必读 state.json"
+
+# -----------------------------------------------------------------------------
+# 可并行提示
+# -----------------------------------------------------------------------------
+parallelizable_batches:
+  - batch: 1
+    agents: [libu]
+  - batch: 2
+    agents: [bingbu]
+  - batch: 3
+    agents: [hubu]
+  - batch: 4
+    agents: [libu_compliance, gongbu_A1, xingbu_A]
+    note: 三者可并行（都依赖 batch 1-3 完成）
+  - batch: 5
+    agents: [gongbu_A2]
+    note: 依赖 batch 4 的 gongbu_A1
+  - batch: 6
+    agents: [menxia]
+    note: 依赖所有上游 + final_prd
+  - batch: 7
+    agents: [gongbu_B, xingbu_B]
+    note: PM 通过方案评审门后并行

@@ -1,0 +1,232 @@
+# 校验规则（Validation Rules）—— 机器可读
+# =========================================================================
+# scripts/validate_contract.py 直接读此文件决定跑哪些校验
+# =========================================================================
+
+_version: "2.0.0"
+
+# -----------------------------------------------------------------------------
+# 校验规则清单（按执行顺序）
+# -----------------------------------------------------------------------------
+rules:
+
+  # ===========================================================================
+  # Rule 1: 文件命名
+  # ===========================================================================
+  - id: file_naming
+    description: "文件路径必须符合 agent_contracts.yaml#*.output.file 模式"
+    applies_to: all_agents
+    severity: P0
+    type: pattern_match
+    check_source: "agent_contracts.yaml#*.output.file"
+    expected_path_template: "归档需求产出/${req_id}/0[1-3]_*/..."
+
+  # ===========================================================================
+  # Rule 2: 必填章节
+  # ===========================================================================
+  - id: required_sections
+    description: "必填章节按 agent_contracts.yaml#*.output.required_sections"
+    applies_to: all_agents
+    severity: P0
+    type: section_existence
+    check_source: "agent_contracts.yaml#*.output.required_sections"
+    match_pattern: "^##\\s*{section_name}\\s*$|^###\\s*{section_name}\\s*$"
+
+  # ===========================================================================
+  # Rule 3: 最小数量校验（按 scale）
+  # ===========================================================================
+  - id: min_counts
+    description: "数量下限按 scale 从 agent_contracts.yaml#*.output.required_sections.*.min_count_by_scale 取"
+    applies_to: [libu, bingbu]
+    severity: P0
+    type: counter
+    check_source: "agent_contracts.yaml#*.output.required_sections.*.min_count_by_scale"
+    count_pattern_examples:
+      persona: "^###\\s*画像\\s*\\d+"
+      scenario: "^###\\s*场景\\s*\\d+|^###\\s*典型场景\\s*\\d+"
+      fr: "^\\|\\s*FR-\\d+|^- \\[ \\]\\s*FR-\\d+"
+
+  # ===========================================================================
+  # Rule 4: 通用防线（13 条）
+  # ===========================================================================
+  - id: universal_guardrails
+    description: "13 条通用防线校验"
+    applies_to: all_agents
+    severity: P0
+    type: regex_check
+    check_source: "guardrails.yaml#universal"
+    checker_file: "scripts/guardrail_checkers.py"
+
+  # ===========================================================================
+  # Rule 5: 专用防线（按 agent）
+  # ===========================================================================
+  - id: agent_specific_guardrails
+    description: "各 Agent 专用防线（g101-g108）"
+    applies_to: [libu, bingbu, hubu, libu_compliance, gongbu, xingbu, menxia]
+    severity: P0
+    type: regex_check
+    check_source: "guardrails.yaml#agent_specific"
+    checker_file: "scripts/guardrail_checkers.py"
+
+  # ===========================================================================
+  # Rule 6: 知识图谱引用必填（v2.0 新增）
+  # ===========================================================================
+  - id: kg_refs_present
+    description: "kg_refs 字段必填（仅 standard/complex）"
+    applies_to: [libu, bingbu, hubu, libu_compliance, gongbu]
+    severity: P0
+    type: yaml_field
+    check_source: "kg_contract.yaml#kg_ref_field"
+    section_match: "## 知识图谱引用"
+    min_count: 1
+    waived_for_legacy: true  # 见 versioning.yaml#legacy_waivers
+
+  # ===========================================================================
+  # Rule 7: 知识图谱引用合法
+  # ===========================================================================
+  - id: kg_refs_valid
+    description: "kg_refs 中每个 entity_id 必须在知识图谱 index.jsonl 中存在"
+    applies_to: [libu, bingbu, hubu, libu_compliance, gongbu]
+    severity: P0
+    type: kg_lookup
+    check_source: "knowledge_graph/index.jsonl"
+    field_check: "entity_id 存在性"
+
+  # ===========================================================================
+  # Rule 8: PRD 格式（仅supervisor final_prd.md）
+  # ===========================================================================
+  - id: prd_format
+    description: "PRD 10 章结构（仅 shangshu 产出的 final_prd.md）"
+    applies_to: [shangshu]
+    severity: P0
+    type: section_existence
+    check_source: "prd_template/prd_10ch.yaml#chapters"
+
+# -----------------------------------------------------------------------------
+# 打回回归流程（v2.0 新增，解决原缺失问题）
+# -----------------------------------------------------------------------------
+revision_cycle:
+  description: |
+    reviewer verdict=fail 后，哪个 Agent 修？怎么修？修完谁再审？
+    原 contracts.md 未明确，v2.0 明确如下：
+  flow:
+    - step: 1
+      actor: reviewer
+      action: "在 review.md 中按 Guardrail #N 引用 + 文件:行 列出 P0 issue"
+    - step: 2
+      actor: supervisor
+      action: "将 P0 issue 路由到对应 Agent（按 issue 涉及的产出文件）"
+    - step: 3
+      actor: 对应 Agent
+      action: "修订产出，重跑 validate_contract.py 直到 exit=0"
+    - step: 4
+      actor: reviewer
+      action: "重审修订后的产出，写复审 verdict（pass/fail）"
+    - step: 5
+      actor: supervisor
+      action: "若第 N 轮仍未通过（scale.light=1, standard=2, complex=3 轮上限），触发冲突门"
+  max_rounds_by_scale:
+    light: 1
+    standard: 2
+    complex: 3
+  conflict_gate:
+    description: "达到 max_rounds 仍未通过时，PM 仲裁"
+    actor: PM
+    fallback: "若 PM 不回应超过 24h，按'宁松不紧'原则强制通过（避免卡死）"
+
+# -----------------------------------------------------------------------------
+# 校验器输出格式
+# -----------------------------------------------------------------------------
+output_format:
+  verdict: enum[pass, fail, warn]
+  score: float
+  violations:
+    - rule_id: string          # e.g. "file_naming", "g001"
+    - severity: enum[P0, P1, P2, P3]
+    - line: int                # 违规所在行号
+    - evidence: string         # 原文片段
+    - fix: string              # 修复建议
+    - guardrail_ref: string    # 关联 Guardrail ID（e.g. "g001"）
+  pass_count: int
+  fail_count: int
+  warn_count: int
+
+  example_pass: |
+    {
+      "file": "归档需求产出/REQ-005/01_drafted/01_user_research.md",
+      "agent": "libu",
+      "scale": "standard",
+      "verdict": "pass",
+      "pass_count": 13,
+      "fail_count": 0,
+      "warn_count": 0,
+      "violations": []
+    }
+
+  example_fail: |
+    {
+      "file": "归档需求产出/REQ-005/01_drafted/01_user_research.md",
+      "agent": "libu",
+      "scale": "standard",
+      "verdict": "fail",
+      "pass_count": 11,
+      "fail_count": 2,
+      "warn_count": 0,
+      "violations": [
+        {
+          "rule_id": "g002",
+          "severity": "P0",
+          "line": 23,
+          "evidence": "数据源：TBD",
+          "fix": "替换为具体值或 [⚠️ 假设 80%]",
+          "guardrail_ref": "g002"
+        },
+        {
+          "rule_id": "kg_refs_present",
+          "severity": "P0",
+          "line": 0,
+          "evidence": "缺失 ## 知识图谱引用 段",
+          "fix": "在文件末尾添加 kg_refs 段，至少 1 个 entity_id",
+          "guardrail_ref": "g014"
+        }
+      ]
+    }
+
+# -----------------------------------------------------------------------------
+# 校验器 CLI
+# -----------------------------------------------------------------------------
+cli:
+  name: scripts/validate_contract.py
+  examples:
+    - "python scripts/validate_contract.py --req REQ-005 --agent libu"
+    - "python scripts/validate_contract.py --req REQ-005 --agent all"
+    - "python scripts/validate_contract.py --file 归档需求产出/REQ-005/01_drafted/01_user_research.md --agent libu --scale standard"
+    - "python scripts/validate_contract.py --req REQ-005 --agent libu --strictness warn"
+    - "python scripts/validate_contract.py --req REQ-005 --agent libu --json"  # 输出 JSON
+
+  exit_codes:
+    0: pass
+    1: warn（仅 WARN，无 fail）
+    2: fail（有 P0 违规）
+
+# -----------------------------------------------------------------------------
+# 校验器依赖
+# -----------------------------------------------------------------------------
+dependencies:
+  python_version: ">=3.8"
+  pip_requirements:
+    - PyYAML  # YAML 解析
+  optional:
+    - rich   # 人读输出美化（可选）
+
+# -----------------------------------------------------------------------------
+# 校验器实现位置
+# -----------------------------------------------------------------------------
+implementation:
+  main_file: scripts/validate_contract.py
+  guardrail_checkers: scripts/guardrail_checkers.py
+  kg_index_reader: scripts/kg_query.py
+  estimated_loc:
+    validate_contract.py: 250
+    guardrail_checkers.py: 400  # 22 条 checker 各 ~15 行
+    kg_query.py: 80

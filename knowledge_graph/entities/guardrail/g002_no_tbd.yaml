@@ -1,0 +1,11 @@
+_type: Guardrail
+id: g002
+name: 不得标 TBD
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "正则匹配 \\bTBD\\b / \\bTODO\\b / 待定，命中则 fail"
+source: workflow/_archive/contracts.v1.md#L66
+created: 2026-07-03
+status: active
+notes: "不确定项必须标 [⚠️ 假设 N%] 或方括号待确认"

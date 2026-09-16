@@ -1,0 +1,10 @@
+_type: Guardrail
+id: g108
+name: 评审组-判据引原文
+category: agent_specific
+agent: menxia
+severity: P0
+check_pattern: "所有判据必须引用原文（文件:行 + 违反契约第几条）"
+source: workflow/_archive/contracts.v1.md#L90
+created: 2026-07-03
+status: active

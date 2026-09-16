@@ -1,0 +1,202 @@
+# 知识图谱 Schema（自描述）
+# =========================================================================
+# 此文件描述 KG 自身的实体/关系类型，被 scripts/ingest_to_kg.py 和
+# scripts/validate_kg.py 引用以做类型校验
+# =========================================================================
+
+_version: "2.0.0"
+_last_updated: 2026-07-03
+
+# -----------------------------------------------------------------------------
+# 实体类型
+# -----------------------------------------------------------------------------
+entity_types:
+
+  Persona:
+    description: 用户画像
+    id_pattern: "^REQ-\\d{3}\\.PERSONA\\.\\d{3}$"
+    required_fields: [id, req_id, name, demographics, core_need, pain_points, source]
+    example:
+      id: "REQ-001.PERSONA.001"
+      req_id: "REQ-001"
+      name: "张三"
+      demographics: { age: 28, role: "后端工程师" }
+      core_need: "5 分钟内提交完一笔报销"
+      pain_points: ["发票要贴成一摞", "Excel 模板要去找主管拿"]
+      source: "deliverables/01_drafted/REQ-001/01_user_research.md#L7"
+      created: "2026-07-03"
+      status: "legacy"
+
+  Scenario:
+    description: 典型场景
+    id_pattern: "^REQ-\\d{3}\\.SCENARIO\\.\\d{3}$"
+    required_fields: [id, req_id, name, trigger, flow, expected_result, failure_points, source]
+    example:
+      id: "REQ-001.SCENARIO.001"
+      req_id: "REQ-001"
+      name: "员工提交差旅报销"
+      trigger: "出差回来，手里有 4 张发票"
+      flow: ["登录 → 选'差旅'类型", "上传发票 → 填金额", "选择审批人 → 提交"]
+      expected_result: "2 分钟内完成，5 分钟内收到主管已读回执"
+      failure_points: ["发票太大上传失败", "审批人离职", "金额超 5000 没人批"]
+      source: "deliverables/01_drafted/REQ-001/01_user_research.md#L29"
+
+  Insight:
+    description: 关键洞察
+    id_pattern: "^REQ-\\d{3}\\.INSIGHT\\.\\d{3}$"
+    required_fields: [id, req_id, text, importance, counter_example, source]
+    example:
+      id: "REQ-001.INSIGHT.001"
+      req_id: "REQ-001"
+      text: "审批效率比'花哨功能'重要 10 倍"
+      importance: "HIGH"
+      counter_example: "传统 OA 系统堆砌 30+ 不常用功能，员工仍用 Excel 报销"
+      source: "deliverables/01_drafted/REQ-001/01_user_research.md#L49"
+
+  FR:
+    description: 功能需求
+    id_pattern: "^REQ-\\d{3}\\.FR\\.\\d{3}$"
+    required_fields: [id, req_id, code, name, priority, owner_persona, description, source]
+    example:
+      id: "REQ-001.FR.001"
+      req_id: "REQ-001"
+      code: "FR-01"
+      name: "新建报销单"
+      priority: "P0"
+      owner_persona: ["REQ-001.PERSONA.001"]
+      description: "选类型、填金额、传发票、选审批人"
+      source: "deliverables/01_drafted/REQ-001/02_strategy_and_risk.md#L11"
+
+  Lesson:
+    description: 教训（全局）
+    id_pattern: "^lesson\\.\\d{3}$"
+    required_fields: [id, title, severity, description, remediation, linked_guardrails, source]
+    example:
+      id: "lesson.001"
+      title: "数据源降级链路必须写完整"
+      severity: "HIGH"
+      description: "示例REQ-A 早期只写了 1 级降级，遇到 主数据源 限流时用户看到空白页"
+      remediation: "原型-A1 契约加 Guardrail #g011 强制 4 级降级"
+      linked_guardrails: ["g011"]
+      source: "workflow/lessons.md#L1"
+
+  Guardrail:
+    description: 防线（全局）
+    id_pattern: "^g\\d{3}$"
+    required_fields: [id, name, category, description, check_pattern, applies_to, source]
+    example:
+      id: "g001"
+      name: "不得捏造事实"
+      category: "universal"
+      description: "数据必须可溯源或显式标注假设"
+      check_pattern: "扫描单独百分比/数据声明，无来源标注则 fail"
+      applies_to: ["all"]
+      source: "workflow/_archive/contracts.v1.md#L65"
+
+  Agent:
+    description: Agent 定义（全局）
+    id_pattern: "^agent\\.[a-z_]+$"
+    required_fields: [id, name_cn, name_en, role, load_order, outputs, guardrails]
+
+  Scale:
+    description: 需求等级（全局）
+    id_pattern: "^scale\\.(light|standard|complex)$"
+    required_fields: [id, name_cn, participants, review_rounds, output_diffs]
+
+  State:
+    description: 工作流状态（全局）
+    id_pattern: "^state\\.[a-z_]+$"
+    required_fields: [id, name_cn, next_states, gate_required]
+
+# -----------------------------------------------------------------------------
+# 关系类型
+# -----------------------------------------------------------------------------
+relation_types:
+
+  produces:
+    description: Agent 产出 Deliverable
+    subject_type: Agent
+    object_type: "Deliverable (file path)"
+    required_attrs: [source, created]
+
+  belongs-to:
+    description: 实体归属于某 REQ
+    subject_type: "Persona|Scenario|FR|NFR|Metric|ComplianceRule|TechComponent|Risk|Annotation"
+    object_type: REQ
+    required_attrs: [source]
+
+  contains:
+    description: REQ 包含这些实体
+    subject_type: REQ
+    object_type: "FR|NFR|Persona|Scenario"
+    required_attrs: [source]
+
+  uses:
+    description: 画像使用某功能或参与某场景
+    subject_type: Persona
+    object_type: "FR|Scenario"
+    required_attrs: [source, confidence]
+
+  measures:
+    description: 指标衡量某功能
+    subject_type: Metric
+    object_type: FR
+    required_attrs: [source]
+
+  constrains:
+    description: 合规规则约束某需求
+    subject_type: ComplianceRule
+    object_type: "FR|NFR"
+    required_attrs: [source]
+
+  implements:
+    description: 技术组件实现某功能
+    subject_type: TechComponent
+    object_type: FR
+    required_attrs: [source]
+
+  references:
+    description: 标注引用某功能
+    subject_type: Annotation
+    object_type: FR
+    required_attrs: [source]
+
+  derived-from:
+    description: 实体派生自某 REQ
+    subject_type: "Lesson|Entity"
+    object_type: REQ
+    required_attrs: [source]
+
+  applies-to:
+    description: 防线适用于某 Agent
+    subject_type: Guardrail
+    object_type: Agent
+    required_attrs: [source]
+
+# -----------------------------------------------------------------------------
+# 通用必填元数据（每实体必带）
+# -----------------------------------------------------------------------------
+common_metadata:
+  - source: "可追溯路径，必填"
+  - created: "YYYY-MM-DD 格式，必填"
+  - status: "legacy | active，必填"
+
+# -----------------------------------------------------------------------------
+# 元数据规范（与 README 同步）
+# -----------------------------------------------------------------------------
+metadata_spec:
+  status_values:
+    legacy: "历史 REQ 入库，校验器对 legacy 实体放宽规则"
+    active: "当前正在使用的实体"
+
+  confidence_range: [0.0, 1.0]
+  confidence_meaning: "0.0=完全不可信，1.0=完全可信"
+
+# -----------------------------------------------------------------------------
+# 索引规范
+# -----------------------------------------------------------------------------
+index_spec:
+  file: knowledge_graph/index.jsonl
+  format: "每行一个 JSON 对象，必含 _type, id, name, path"
+  example: |
+  rebuild_command: "python scripts/ingest_to_kg.py --rebuild-index"

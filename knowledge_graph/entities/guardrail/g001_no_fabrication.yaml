@@ -1,0 +1,16 @@
+_type: Guardrail
+id: g001
+name: 不得捏造事实
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "扫描单独百分比/数据声明，无来源标注则 fail"
+source: workflow/_archive/contracts.v1.md#L65
+created: 2026-07-03
+status: active
+notes: |
+  任何用户画像/场景/竞品/指标数据/接口响应声明
+  必须能溯源到 PM 原始需求，或显式标注"假设 N%"
+violation_examples:
+  - "同行业平均转化率为 15%（无来源）"
+  - "用户期待 X 功能（无调研支撑）"

@@ -1,0 +1,11 @@
+_type: Guardrail
+id: g004
+name: 不得使用"等"字收尾
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "正则匹配：枚举末尾'等'字"
+source: workflow/_archive/contracts.v1.md#L68
+created: 2026-07-03
+status: active
+notes: "补救：标'仅列当前已知项'或'共 N 项，已列完'"

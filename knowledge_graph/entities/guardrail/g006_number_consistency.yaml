@@ -1,0 +1,10 @@
+_type: Guardrail
+id: g006
+name: 编号一致性
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "跨文件引用 FR-XX / 画像-XX 必须用全局统一编号"
+source: workflow/_archive/contracts.v1.md#L70
+created: 2026-07-03
+status: active

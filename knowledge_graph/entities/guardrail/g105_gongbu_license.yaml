@@ -1,0 +1,11 @@
+_type: Guardrail
+id: g105
+name: 原型-A1-许可证必标
+category: agent_specific
+agent: gongbu
+severity: P0
+check_pattern: "技术方案每个组件/依赖必须注明许可证类型"
+source: workflow/_archive/contracts.v1.md#L87
+created: 2026-07-03
+status: active
+legal_values: [MIT, Apache, GPL, BSD, 商业, 自研]

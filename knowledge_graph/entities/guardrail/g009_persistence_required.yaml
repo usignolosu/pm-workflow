@@ -1,0 +1,11 @@
+_type: Guardrail
+id: g009
+name: 持久化方案必填
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "涉及数据存储的功能必须写明持久化方式"
+source: workflow/_archive/contracts.v1.md#L73
+created: 2026-07-03
+status: active
+legal_values: [LocalStorage, SQLite, PostgreSQL, 内存, 不持久化]

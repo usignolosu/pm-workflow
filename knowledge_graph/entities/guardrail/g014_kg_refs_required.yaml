@@ -1,0 +1,15 @@
+_type: Guardrail
+id: g014
+name: 知识图谱引用必填
+category: universal
+severity: P0
+applies_to: [libu, bingbu, hubu, libu_compliance, gongbu]
+applies_to_scale: [standard, complex]
+check_pattern: "产出中必须包含 kg_refs 字段，至少 1 个有效 entity_id"
+source: 本次 v2.0 重构新增
+created: 2026-07-03
+status: active
+waived_for_legacy: true
+notes: |
+  v2.0 新增防线。校验器对历史 REQ-001~004 自动豁免。
+  新 REQ 走 standard/complex 必填 kg_refs。

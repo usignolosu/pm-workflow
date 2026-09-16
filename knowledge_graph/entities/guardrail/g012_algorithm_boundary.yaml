@@ -1,0 +1,10 @@
+_type: Guardrail
+id: g012
+name: 算法边界条件必写
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "必含：零输入/满输入/单值输入/整除边界/索引越界/时序靠后数据不完整"
+source: workflow/_archive/contracts.v1.md#L76
+created: 2026-07-03
+status: active

@@ -1,0 +1,10 @@
+_type: Guardrail
+id: g005
+name: 不得跳级传递
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "检查下游 Agent 是否在 state.json 中上游 step 未完成时启动"
+source: workflow/_archive/contracts.v1.md#L69
+created: 2026-07-03
+status: active

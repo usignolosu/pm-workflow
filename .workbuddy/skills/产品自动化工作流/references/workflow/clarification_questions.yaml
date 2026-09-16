@@ -1,0 +1,163 @@
+# 需求澄清问题模板（CLARIFICATION Gate）
+# =========================================================================
+# supervisor在 INIT 之后、DRAFTING 之前主动问 PM 的 5 维度问题清单。
+# scale-dependent 触发（complex 默认开、standard 可选、light 默认关）。
+# PM 可"跳过澄清"，标 clarification_skipped: true 后用默认值继续。
+# =========================================================================
+
+_version: "1.0.0"
+_last_updated: 2026-07-03
+_owner: supervisor
+_trigger_rules:
+  light: "默认跳过，PM 说'开启澄清门'才启用"
+  standard: "默认跳过，PM 说'开启澄清门'或'本次要澄清'才启用"
+  complex: "默认启用，PM 说'跳过澄清'才跳过"
+
+# -----------------------------------------------------------------------------
+# 5 个澄清维度（必问）
+# -----------------------------------------------------------------------------
+dimensions:
+
+  - id: background
+    label: "背景"
+    question: "这个需求的背景是什么？为什么现在做？触发你提需求的事件是什么？"
+    why_ask: |
+      避免 Agent 按猜测画像。先知道 PM 真实动机，再去理解为什么这个需求值得做。
+      背景是 PRD 第 1 章'执行摘要'和第 2 章'问题陈述'的核心素材。
+    impact: "影响用户研究画像'核心诉求'字段的措辞、洞察反例的方向"
+    default_value: "PM 已在 initial_request.md 中描述（从原文推断，置信度 60%）"
+    required: true
+    example_answer: |
+      公司内部文档分散在 5 个系统（Confluence、Notion、SharePoint、本地硬盘、邮件），
+      找一份 3 个月前的设计文档平均花 15 分钟，新人入职第一周几乎找不到任何历史决策。
+      上周 CTO 吐槽'我们公司的知识在脑子里，不在系统里'，触发这次需求。
+    checklist_for_agents:
+      - "画像'核心诉求'字段直接引用此答复"
+      - "PRD 第 2 章问题陈述以'当前痛点 = ... → 不解决的代价 = ...'结构展开"
+      - "洞察反例应针对'分散在多系统'的真实痛点而非泛泛而谈"
+
+  - id: core_problem
+    label: "核心问题"
+    question: "这个需求要解决的核心问题是什么？不解决的代价是什么？谁最痛？"
+    why_ask: |
+      PRD 第 2 章'问题陈述'必须由 PM 提供，Agent 不能编。
+      核心问题 vs 表面需求：表面是"做一个搜索"，核心是"让新人 5 分钟内找到 3 个月前的设计文档"。
+    impact: "影响 PRD 第 2 章内容、洞察反例的方向、验收标准的'反例支撑'字段"
+    default_value: "从 PM 需求文本推断（置信度 < 50%，建议 PM 显式确认）"
+    required: true
+    example_answer: |
+      核心：知识检索效率低 → 新人上手慢 → 团队规模化受限
+      谁最痛：入职 1-3 个月的新人（找不到历史决策）、跨项目协作的工程师（找不到上下文）
+      不解决：3 年后团队规模翻倍但知识密度不增，决策重复造轮子
+    checklist_for_agents:
+      - "PRD 第 2 章必须有'谁痛 + 为什么痛 + 不解决代价'三段"
+      - "验收标准应能反向验证'核心问题已解决'（如新人 5 分钟内能找到）"
+
+  - id: scope
+    label: "预期范围"
+    question: "预期范围是什么？MVP 边界？什么不做？哪些可以晚点再做？"
+    why_ask: |
+      避免 Agent 跑出超过 PM 预期的功能范围。
+      PM 说"做一个搜索"——是仅文本搜索？还是全文 + 语义 + 标签过滤 + 智能推荐？
+      范围不清 = Agent 默认做最大集 = 大量返工。
+    impact: "影响Specialists产出的颗粒度、reviewer审核的'范围合理性'"
+    default_value: "默认包含 PM 需求中提到的所有功能（不做减法）"
+    required: true
+    example_answer: |
+      MVP（V1 必须做）：
+      - 全文搜索（关键词 + 标签过滤）
+      - 统一索引（聚合 Confluence + Notion + 本地硬盘）
+      - 用户登录 + 权限管理
+
+      V2 再做（先不做）：
+      - 语义搜索
+      - 智能问答
+      - 自动摘要
+    checklist_for_agents:
+      - "用户研究场景数严格按 V1 范围设计，不画 V2 饼"
+      - "原型技术方案标注 MVP 边界，未实现的部分写'V2 计划'"
+
+  - id: scenarios
+    label: "场景"
+    question: "典型使用场景是什么？触发频次？每天/每周/每月发生？"
+    why_ask: |
+      用户研究画像中的'典型场景'是 PRD 第 4 章核心。
+      场景不清 = 用户研究编场景 = 场景假大空。
+    impact: "影响 01_user_research.md 的场景数量（≥2）和场景真实性"
+    default_value: "默认基于 PM 提到的用户角色构造（场景可能虚构）"
+    required: true
+    example_answer: |
+      场景 A：新人入职第 1 周，要找 3 个月前的某个功能设计文档（频次：每月 5-10 次）
+      场景 B：跨项目工程师协作，要找其他团队的接口文档（频次：每周 10+ 次）
+      场景 C：管理层要查决策历史（频次：每月 2-3 次）
+    checklist_for_agents:
+      - "每个场景必须有'触发条件 + 流程 + 期望结果 + 失败点'四段"
+      - "场景频次量化（每天/每周/每月/每年）而非'偶尔'"
+      - "场景数 ≥ scale 要求（light≥1 / standard≥2 / complex≥3）"
+
+  - id: users
+    label: "用户"
+    question: "谁会用？多少人？付费意愿？替代方案是什么？"
+    why_ask: |
+      用户研究画像数量必须 scale 适配（light≥1 / standard≥2 / complex≥3）。
+      用户不清 = 用户研究按通用'员工/管理员'模板写 = 画像无差异化。
+    impact: "影响 01_user_research.md 的画像数量与差异化"
+    default_value: "默认基于 PM 描述构造 2 类画像（通用模板）"
+    required: true
+    example_answer: |
+      主要用户：
+      1. 新入职工程师（30 人/月，无付费意愿，免费就行）
+      2. 跨项目协作的工程师（200 人，付费意愿弱但愿为效率付费）
+      3. 管理层（10 人，查决策历史）
+
+      替代方案：Google 搜 + Confluence 站内搜 + 问同事（每天问 5+ 次）
+    checklist_for_agents:
+      - "画像数量严格按 scale 适配"
+      - "每个画像必须有'身份 + 核心诉求 + 痛点 + 替代方案'四段"
+      - "画像不能凭空捏造（Guardrail #g001 不得捏造事实）"
+
+# -----------------------------------------------------------------------------
+# 超时规则
+# -----------------------------------------------------------------------------
+timeout:
+  default_minutes: 30
+  scale_adjustments:
+    light: 10     # light 短，避免 PM 等待太久
+    standard: 30  # 默认
+    complex: 60   # complex 给 PM 更长时间
+  on_timeout:
+    action: "auto_skip"
+    clarification_skipped: "timeout"
+    log_to: "feedback_log/clarification/timeout_${req_id}_${date}.md"
+
+# -----------------------------------------------------------------------------
+# PM 响应格式
+# -----------------------------------------------------------------------------
+pm_response_format:
+  answer:
+    command: "回答：[答复文本]"
+    format: |
+      1. 背景：[答复]
+      2. 核心问题：[答复]
+      3. 预期范围：[答复]
+      4. 场景：[答复]
+      5. 用户：[答复]
+    note: "PM 可以一次性回答 5 维度，也可以分多次（'回答 1：背景=...'）。"
+  submit:
+    command: "✅ 答完了"
+    effect: "标 clarification_pending=null，进 DRAFTING"
+  skip:
+    command: "跳过澄清"
+    effect: "标 clarification_skipped=true，用默认值继续"
+  redo:
+    command: "清单再看一下"
+    effect: "重新展示 5 维度问题清单"
+
+# -----------------------------------------------------------------------------
+# 兼容历史 REQ
+# -----------------------------------------------------------------------------
+legacy_compatibility:
+  description: "REQ-001~004 在澄清门引入前完成，自动豁免"
+  applies_to_req_ids: [REQ-001, REQ-002, 示例REQ-A, 示例REQ-B]
+  default_clarification_skipped: true
+  note: "校验器 validate_contract.py 检测到 legacy REQ 跳过澄清门相关校验"

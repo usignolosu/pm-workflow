@@ -1,0 +1,10 @@
+_type: Guardrail
+id: g010
+name: 数据时间戳必填
+category: universal
+severity: P0
+applies_to: [all]
+check_pattern: "涉及外部数据展示的功能必写'更新时间展示方式'+'数据时效标注'"
+source: workflow/_archive/contracts.v1.md#L74
+created: 2026-07-03
+status: active

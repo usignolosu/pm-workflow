@@ -1,0 +1,241 @@
+# 知识图谱契约（Knowledge Graph Contract）—— v2.0 新增
+# =========================================================================
+# 定义知识图谱如何被 Agent 引用、如何被校验器验证
+# =========================================================================
+
+_version: "2.0.0"
+_description: |
+  本契约是 v2.0 重构的核心新增。
+  定义：
+  - 实体 ID 命名规范
+  - kg_refs 字段格式（每个 Agent 产出的必填段）
+  - 查询/写入 API
+  - Guardrail #14 的具体规则
+
+# -----------------------------------------------------------------------------
+# 实体 ID 格式
+# -----------------------------------------------------------------------------
+entity_id_format:
+  pattern: "^(REQ-\\d{3}\\.[A-Z_]+\\.\\d{3}|g\\d{3}|lesson\\.\\d{3}|agent\\.[a-z_]+|scale\\.[a-z]+|state\\.[a-z_]+)$"
+  examples:
+    REQ内: ["REQ-001.PERSONA.001", "REQ-001.FR.001", "REQ-001.SCENARIO.001"]
+    全局: ["g001", "g014", "lesson.001", "agent.libu", "scale.standard", "state.drafting"]
+  regex_test_command: |
+    python3 -c "import re; print(re.match('^(REQ-\\d{3}\\.[A-Z_]+\\.\\d{3}|g\\d{3}|lesson\\.\\d{3}|agent\\.[a-z_]+|scale\\.[a-z]+|state\\.[a-z_]+)$', 'REQ-001.PERSONA.001'))"
+
+# -----------------------------------------------------------------------------
+# Agent 产出中的 kg_refs 字段规范
+# -----------------------------------------------------------------------------
+kg_ref_field:
+  location_pattern: "## 知识图谱引用"   # 必须出现在该二级标题下
+  format: |
+    ```yaml
+    kg_refs:
+      - entity_id: <ENTITY_ID>
+        role: <template|reference|counter_example>
+        note: <free text>
+    ```
+  required_when:
+    scale_standard: true
+    scale_complex: true
+    scale_light: false
+  roles:
+    template: "参考此实体的结构/字段/写法"
+    reference: "引用此实体的内容作为依据"
+    counter_example: "作为反例使用，说明本 REQ 的差异"
+  required_for_agents: [libu, bingbu, hubu, libu_compliance, gongbu]
+
+# -----------------------------------------------------------------------------
+# 校验器对 kg_refs 的处理
+# -----------------------------------------------------------------------------
+validator_behavior:
+  on_missing_kg_refs:
+    scale_standard_or_complex: "P0 fail（违反 Guardrail #g014）"
+    scale_light: "skip"
+  on_invalid_entity_id:
+    check: "entity_id 必须匹配 entity_id_format.pattern 且存在于 knowledge_graph/index.jsonl"
+    action: "P0 fail"
+  on_unused_kg_refs:
+    check: "kg_refs 引用的 entity_id 是否在产出正文中被提及"
+    action: "WARN（建议但非强制）"
+  on_no_counter_example:
+    check: "libu/bingbu 的 kg_refs 是否至少 1 个 role=counter_example"
+    action: "WARN（防模板污染）"
+
+# -----------------------------------------------------------------------------
+# 实体类型清单
+# -----------------------------------------------------------------------------
+entity_types:
+  - id: Persona
+    description: "用户画像"
+    id_pattern: "REQ-XXX.PERSONA.NNN"
+    required_fields: [id, req_id, name, demographics, core_need, pain_points, source]
+  - id: Scenario
+    description: "典型场景"
+    id_pattern: "REQ-XXX.SCENARIO.NNN"
+    required_fields: [id, req_id, name, trigger, flow, expected_result, failure_points, source]
+  - id: Insight
+    description: "关键洞察"
+    id_pattern: "REQ-XXX.INSIGHT.NNN"
+    required_fields: [id, req_id, text, importance, source]
+  - id: FR
+    description: "功能需求"
+    id_pattern: "REQ-XXX.FR.NNN"
+    required_fields: [id, req_id, code, name, priority, owner_persona, description, source]
+  - id: NFR
+    description: "非功能需求"
+    id_pattern: "REQ-XXX.NFR.NNN"
+    required_fields: [id, req_id, category, priority, description, source]
+  - id: Metric
+    description: "指标"
+    id_pattern: "REQ-XXX.METRIC.NNN"
+    required_fields: [id, req_id, name, formula, data_source, frequency, target_value, measures_fr, source]
+  - id: ComplianceRule
+    description: "合规规则"
+    id_pattern: "REQ-XXX.COMPLIANCE.NNN"
+    required_fields: [id, req_id, category, judgment, description, source]
+  - id: TechComponent
+    description: "技术组件"
+    id_pattern: "REQ-XXX.TECH.NNN"
+    required_fields: [id, req_id, name, category, license, implements_fr, description, source]
+  - id: Risk
+    description: "风险"
+    id_pattern: "REQ-XXX.RISK.NNN"
+    required_fields: [id, req_id, name, level, probability, impact, mitigation, source]
+  - id: Annotation
+    description: "原型标注"
+    id_pattern: "REQ-XXX.ANNO.NNN"
+    required_fields: [id, req_id, number, page, element, interaction, data_source, validation, source]
+  - id: Lesson
+    description: "教训（全局）"
+    id_pattern: "lesson.NNN"
+    required_fields: [id, title, severity, description, remediation, linked_guardrails, source]
+  - id: Guardrail
+    description: "防线（全局）"
+    id_pattern: "gNNN"
+    required_fields: [id, name, category, description, check_pattern, applies_to, source]
+  - id: Agent
+    description: "Agent 定义（全局）"
+    id_pattern: "agent.{slug}"
+    required_fields: [id, name_cn, name_en, role, load_order, outputs, guardrails]
+  - id: Scale
+    description: "需求等级（全局）"
+    id_pattern: "scale.{level}"
+    required_fields: [id, name_cn, participants, review_rounds, output_diffs]
+  - id: State
+    description: "工作流状态（全局）"
+    id_pattern: "state.{step}"
+    required_fields: [id, name_cn, next_states, gate_required]
+
+# -----------------------------------------------------------------------------
+# 关系类型清单
+# -----------------------------------------------------------------------------
+relation_types:
+  - predicate: produces
+    subject: Agent
+    object: Deliverable
+    required_attrs: [source, created]
+  - predicate: belongs-to
+    subject: "Persona/Scenario/FR/NFR/Metric/ComplianceRule/TechComponent/Risk/Annotation"
+    object: REQ
+    required_attrs: [source]
+  - predicate: contains
+    subject: REQ
+    object: "FR/NFR/Persona/Scenario"
+    required_attrs: [source]
+  - predicate: uses
+    subject: Persona
+    object: "FR/Scenario"
+    required_attrs: [source, confidence]
+  - predicate: measures
+    subject: Metric
+    object: FR
+    required_attrs: [source]
+  - predicate: constrains
+    subject: ComplianceRule
+    object: "FR/NFR"
+    required_attrs: [source]
+  - predicate: implements
+    subject: TechComponent
+    object: FR
+    required_attrs: [source]
+  - predicate: references
+    subject: Annotation
+    object: FR
+    required_attrs: [source]
+  - predicate: derived-from
+    subject: "Lesson/Entity"
+    object: REQ
+    required_attrs: [source]
+  - predicate: applies-to
+    subject: Guardrail
+    object: Agent
+    required_attrs: [source]
+
+# -----------------------------------------------------------------------------
+# 查询 API
+# -----------------------------------------------------------------------------
+query_api:
+  cli: "scripts/query_kg.py"
+  python: |
+    from scripts.kg_query import KGQuery
+    kg = KGQuery()
+    kg.by_type("persona", scale="standard")
+    kg.by_entity("REQ-001.PERSONA.001")
+    kg.by_keywords(["审批", "报销"])
+  examples:
+    - "scripts/query_kg.py --type persona --scale standard"
+    - "scripts/query_kg.py --type fr --keywords '报销 审批'"
+    - "scripts/query_kg.py --entity REQ-001.PERSONA.001"
+    - "scripts/query_kg.py --type compliance_rule --industry 金融"
+
+# -----------------------------------------------------------------------------
+# 写入 API
+# -----------------------------------------------------------------------------
+ingest_api:
+  cli: "scripts/ingest_to_kg.py"
+  python: |
+    from scripts.ingest import KGIngest
+    ingest = KGIngest()
+    ingest.ingest_req("REQ-005", mode="semi-auto")
+  triggers:
+    - "DELIVERED 事件（deliver_hook.sh 改造）"
+    - "手动命令（PM 触发历史 REQ 回填）"
+  modes:
+    manual: "从 stdin 粘贴 YAML，由人审核后入库"
+    semi_auto: "脚本自动抽取 + 人工审核确认"
+
+# -----------------------------------------------------------------------------
+# Guardrail #14 完整定义（与 guardrails.yaml 同步）
+# -----------------------------------------------------------------------------
+guardrails:
+  - id: g014
+    name: 知识图谱引用必填
+    severity: P0
+    applies_to: [libu, bingbu, hubu, libu_compliance, gongbu]
+    applies_to_scale: [standard, complex]
+    check_pattern: |
+      standard/complex 等级的 REQ 产出中必须包含 kg_refs 字段
+      至少 1 个有效 entity_id
+    validator: "scripts/validate_contract.py"
+    source: 本次 v2.0 重构新增
+    waived_for_legacy: true  # 见 versioning.yaml#legacy_waivers
+
+# -----------------------------------------------------------------------------
+# 知识图谱物理布局
+# -----------------------------------------------------------------------------
+physical_layout:
+  root: knowledge_graph/
+  structure: |
+    knowledge_graph/
+    ├── README.md
+    ├── schema.yaml                       # 实体/关系类型定义（自描述）
+    ├── index.jsonl                       # 扁平索引（jq/grep 可查）
+    ├── entities/                         # 全局共享实体
+    │   ├── agent/{libu,bingbu,...}.yaml
+    │   ├── guardrail/g001~g108,g014.yaml
+    │   ├── scale/{light,standard,complex}.yaml
+    │   └── state/{init,drafting,...}.yaml
+    ├── legacy/                           # 历史 REQ 入库
+    │   └── REQ-XXX/{personas,scenarios,insights,fr,nfr,metrics,risks,compliance,tech,lessons,relations}.yaml
+    └── _overproduced/                    # 降级时归档"超出当前等级"的产物
