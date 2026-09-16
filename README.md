@@ -144,7 +144,7 @@ NODE_PATH=$HOME/.workbuddy/binaries/node/workspace/node_modules
 ## 六、目录结构
 
 ```
-product-automation-workflow/
+pm-workflow/
 ├── .workbuddy/skills/产品自动化工作流/   ← Skill 本体（145 文件）
 │   ├── SKILL.md                         ← 主入口
 │   ├── scripts/                        ← 26 个脚本（self_check / validate_contract / gen_screenshots / ...）
@@ -208,7 +208,7 @@ puppeteer-core   # 截图（无需下载 Chromium，指向系统 Chrome）
 
 ## 九、许可
 
-[MIT](LICENSE) © 2026 product-automation-workflow Contributors
+[MIT](LICENSE) © 2026 pm-workflow Contributors
 
 ---
 

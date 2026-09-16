@@ -81,8 +81,8 @@ $PY .workbuddy/skills/产品自动化工作流/scripts/validate_contract.py \
 
 ```bash
 # 1. 克隆
-git clone https://github.com/<your-org>/product-automation-workflow.git
-cd product-automation-workflow
+git clone https://github.com/<your-org>/pm-workflow.git
+cd pm-workflow
 
 # 2. 受管运行时（macOS 由 WorkBuddy 自带）
 PY=$HOME/.workbuddy/binaries/python/envs/default/bin/python
