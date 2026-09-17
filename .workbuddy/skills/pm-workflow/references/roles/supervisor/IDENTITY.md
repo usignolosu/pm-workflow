@@ -1,6 +1,6 @@
 # 主编排 · supervisor
 
-> v3.4 模板化：完整规范见 [Obsidian · 角色说明](工作流体系/角色说明.md#identity-模板)
+> v3.4 模板化：完整规范在仓库外维护（本文件为精简入口）
 > 原文件备份于 git history
 
 ## 身份
@@ -25,4 +25,4 @@
 
 ## 模板引用
 
-详细 IDENTITY 模板见 [Obsidian · 角色说明](工作流体系/角色说明.md#identity-模板)
+详细 IDENTITY 模板见角色说明文档（仓库外维护）

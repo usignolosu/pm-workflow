@@ -48,13 +48,15 @@ def _latest_state_file():
     return files[0] if files else None
 # v4.0.1 修复：Obsidian vault 路径硬编码 → 配置化
 # 优先级：OBSIDIAN_VAULT 环境变量 > state.json obsidian_note_path > 默认值
-_DEFAULT_OBSIDIAN = Path.home() / "Documents" / "Codex" / "obsidian_ai"
+_DEFAULT_OBSIDIAN = Path.home() / "Documents" / "obsidian"
+# 默认笔记相对 vault 根的路径（不绑定作者私有目录结构）
+_OBSIDIAN_NOTE_REL = Path("任务总览.md")
 
 
 def _resolve_obsidian_path() -> Path:
     env_vault = os.environ.get("OBSIDIAN_VAULT")
     if env_vault:
-        return Path(env_vault) / "10-Notes" / "工作流体系" / "任务总览.md"
+        return Path(env_vault) / _OBSIDIAN_NOTE_REL
     # state.json 可选覆盖（Route X：随 run 隔离，取最近修改的一份）
     sf = _latest_state_file()
     if sf:
@@ -65,16 +67,20 @@ def _resolve_obsidian_path() -> Path:
                 return Path(custom)
         except (json.JSONDecodeError, OSError):
             pass
-    return _DEFAULT_OBSIDIAN / "10-Notes" / "工作流体系" / "任务总览.md"
+    return _DEFAULT_OBSIDIAN / _OBSIDIAN_NOTE_REL
 
 
 OBSIDIAN_NOTE = _resolve_obsidian_path()
 
 
 def load_state():
-    if not STATE.exists():
+    # D0 修复：原代码引用了从未定义的全局 STATE 导致三条入口统一崩溃。
+    # 改回与同文件其他函数一致的写法：用 _latest_state_file() 定位最近修改的 state.json，
+    # 不存在时返回空字典（与历史 REQ 为空时的渲染分支兼容）。
+    sf = _latest_state_file()
+    if sf is None or not sf.exists():
         return {}
-    return json.loads(STATE.read_text(encoding="utf-8"))
+    return json.loads(sf.read_text(encoding="utf-8"))
 
 
 def load_kg_stats():

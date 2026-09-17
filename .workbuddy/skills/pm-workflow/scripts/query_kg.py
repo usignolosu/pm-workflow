@@ -192,7 +192,7 @@ def main():
     p.add_argument("--type", help="按实体类型查（Persona/Scenario/Insight/FR/...）")
     p.add_argument("--entity", help="按 entity_id 精确查")
     p.add_argument("--keywords", help="按关键词过滤（空格分隔 OR 匹配）")
-    p.add_argument("--scale", choices=["light", "standard", "complex"], help="按 scale 过滤（当前未实现，仅占位）")
+    p.add_argument("--scale", choices=["light", "standard", "complex"], help="按 scale 档位过滤历史实体（light/standard/complex）；实现上通过 REQ_SCALE 表以 req_id 前缀映射对应 scale 时代")
     p.add_argument("--industry", help="按行业过滤（仅 compliance_rule 用）")
     p.add_argument("--brief", action="store_true", help="仅输出一行摘要（id + name + 描述首行），不输出完整 YAML")
     p.add_argument("--count-only", action="store_true", help="仅输出数量，不列实体")

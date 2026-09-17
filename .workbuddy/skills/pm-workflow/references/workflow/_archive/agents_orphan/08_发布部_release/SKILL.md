@@ -7,7 +7,7 @@
 - `deliverables/03_finalized/REQ-XXX/implementation/test_report.md`（缺陷）
 - `git log --oneline --all`（commit 历史）
 - `evolution_log/*.md`（自我进化记录）
-- `Obsidian/工作流体系/`（笔记）
+- `仓库外笔记/`（可选，仓库外维护）
 
 ## 输出模板
 
@@ -31,7 +31,7 @@
 
 ## 关联
 - Commit: [hash] feat: ...
-- Obsidian: [[v4.0 任务总览面板]]
+- 关联笔记: v4.0 任务总览面板（仓库外维护）
 - 知识图谱: 96 实体（+X 本次新增）
 
 ## 元数据
@@ -46,7 +46,7 @@
 2. 缺陷统计（从 test_report.md 提取，按 P0/P1/P2/P3 分组）
 3. 已知风险（任何 guardrail 违规 + 未修缺陷）
 4. Commit hash（git log 找最近一次与 REQ-XXX 相关的）
-5. Obsidian 链接（如果有相关笔记）
+5. 关联笔记链接（如果有相关仓库外笔记）
 
 ## 不要做
 
