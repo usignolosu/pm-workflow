@@ -171,7 +171,7 @@ knowledge_graph/
 
 | 维度 | 示例仓库 v3.x | 本工作区 v7.0.0 | 变化原因 |
 |---|---|---|---|
-| 路径 | `姊妹工作流仓库（已归档姊妹仓）/` | `<workspace>/` | 合并 |
+| 路径 | `姊妹工作流仓库（已归档）/` | `<workspace>/` | 合并 |
 | 旧称 | 三省六部 agent 名 | `libu` / `bingbu` / `shangshu` / `menxia` 等 slug | 清旧名，按职能命名 |
 | 实体数 | 22（仅 guardrail） | **128**（+Lesson +Persona +Scenario） | 合并时补齐 |
 | 强制项 | 仅校验存在 | **校验存在 + 至少 1 counter_example** | 防模板污染（实战需要） |

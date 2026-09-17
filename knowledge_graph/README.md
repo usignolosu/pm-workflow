@@ -1,6 +1,6 @@
 # 知识图谱（Knowledge Graph）
 
-> 项目路径：`姊妹工作流仓库（已归档姊妹仓）/knowledge_graph/`
+> 项目路径：`姊妹工作流仓库（已归档）/knowledge_graph/`
 > 引入版本：v2.0.0（2026-07-03）
 > 关联契约：`contracts/schema/kg_contract.yaml`
 
