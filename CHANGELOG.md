@@ -8,7 +8,7 @@ Pm Workflow的所有显著变更均记录于此。格式基于 [Keep a Changelog
 
 ### 重大变更（MAJOR · 破坏性架构）
 
-合并两两套工作流（示例仓库 v5.1/v6.0 + B 仓 v7.0.0）后定稿。
+合并两两套工作流（姊妹工作流仓库 v5.1/v6.0 + B 仓 v7.0.0）后定稿。
 
 #### 形态
 - **独立 CLI → Skill 形态**：从 `.workbuddy/skills/pm-workflow/SKILL.md` 加载，由 WorkBuddy 项目级调度
@@ -31,10 +31,10 @@ Pm Workflow的所有显著变更均记录于此。格式基于 [Keep a Changelog
 - **19 → 20 条**：新增 `g014 KG 必填`（standard/complex 必填 kg_refs，至少 1 条 `role: counter_example` 防模板污染）
 
 #### KG
-- **22 实体（仅 guardrail）→ 31 实体**（合并 示例仓库 + 本工作区演化）
+- **22 实体（仅 guardrail）→ 31 实体**（合并 姊妹工作流仓库 + 本工作区演化）
 
 #### PRD 模板
-- **10 章 → 14 模块**：吸收 示例仓库 4 项补强（§7.0 成功指标 / §14.0 开放问题 / §6 截图标注索引表 / §11 EARS 句式强制）
+- **10 章 → 14 模块**：吸收 姊妹工作流仓库 4 项补强（§7.0 成功指标 / §14.0 开放问题 / §6 截图标注索引表 / §11 EARS 句式强制）
 
 ### 修复
 - `gen_screenshots.js` 切屏函数不再写死 `go()`，按 `go/show/select/nav/switchPage/goTo` 逐个探测（修复前 3/3 张同图 → 修复后 0/3）

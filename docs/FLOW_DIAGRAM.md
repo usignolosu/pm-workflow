@@ -3,7 +3,7 @@
 > **路径**：`<workspace>/`（项目工作区 + 项目级 Skill）
 > **形态**：Skill 形态（`.workbuddy/skills/pm-workflow/SKILL.md`），不是独立系统、不是插件
 > **版本**：v7.0.0（2026-09-16 · 合并两套工作流后定稿）
-> **来源**：原 示例仓库 `docs/FLOW_DIAGRAM.md`（v5.1/v6.0，三省六部·24 状态·lean_pm/standard/enhanced）已废弃——本文件为合并版
+> **来源**：原 姊妹工作流仓库 `docs/FLOW_DIAGRAM.md`（v5.1/v6.0，三省六部·24 状态·lean_pm/standard/enhanced）已废弃——本文件为合并版
 > **执行主体**：单一 WorkBuddy 会话内由 agent 扮演多个角色（无独立进程、无 MCP spawn）
 
 ---
@@ -40,7 +40,7 @@ flowchart TD
     CODE --> Q
     Q -->|人工门 4|G4{门 4 通过?}
     G4 -->|否| FIX4[打回 / 补充] --> Q
-    G4 -->|是| ARCH["归档<br/>runs/demo-xxx/<br/>→ 示例需求产出/"]
+    G4 -->|是| ARCH["归档<br/>runs/demo-xxx/<br/>→ 项目名需求产出/"]
 
     ARCH --> NEXT(["结束 / 或下一需求"])
 ```
@@ -169,7 +169,7 @@ kg_refs:
     note: 引用理由（为什么参考 / 哪个字段借鉴了 / 为什么是反例）
 ```
 
-**当前图谱**：31 实体 / 27 文件（合并 示例仓库 + 本工作区演化），覆盖 `Persona` / `Scenario` / `Insight` / `Feature` / `Lesson` 五类。
+**当前图谱**：31 实体 / 27 文件（合并 姊妹工作流仓库 + 本工作区演化），覆盖 `Persona` / `Scenario` / `Insight` / `Feature` / `Lesson` 五类。
 
 **典型用例**（示例需求，run-id `demo-20260101`）：
 - `示例REQ-B.SCENARIO.002`（reference）—— 前序「示例分析平台 V2」的「策略想法验证+回测」场景，本需求 S2 的直接前身
@@ -207,12 +207,12 @@ kg_refs:
 | 维度 | v5.1 / v6.0 | v7.0.0 | 变化原因 |
 |---|---|---|---|
 | **形态** | 独立 CLI 工具 + 状态机 | Skill 形态（WorkBuddy 项目级） | 与 WorkBuddy 平台对齐，平台级调度更稳定 |
-| **角色** | 三省六部 8 agent（尚书/门下/中书/吏/兵/户/礼/工/刑） | 13 常驻 + 复杂 3 扩展 | 合并 示例仓库后清旧名；按职能（而非朝堂）命名更专业 |
+| **角色** | 三省六部 8 agent（尚书/门下/中书/吏/兵/户/礼/工/刑） | 13 常驻 + 复杂 3 扩展 | 合并 姊妹工作流仓库后清旧名；按职能（而非朝堂）命名更专业 |
 | **规模** | 3 mode（lean_pm/standard/enhanced） | 3 规模（lightweight/standard/complex）× 1 开关 `deliver_code` | BMAD 启示：单循环 + 开关比矩阵更易演进 |
 | **门** | 5 硬门 + 4 软门（9 道打断） | 4 人工门 + 机器门自动跑（≤4 次打断） | 减少打断 = 提升 PM 体验 |
 | **状态** | 24 状态机 + 根 `state.json` | `runs/<run-id>/execution-log.md` | 状态机过重；执行日志更轻、更易回溯 |
 | **执行主体** | 一个 CLI agent 会话 + 8 提示词切换 | 一个 WorkBuddy 会话 + 角色内扮演 | 本质未变，但调用入口更统一 |
-| **PRD** | 10 章模板 | 14 模块（加成功指标 §7.0、开放问题 §14.0、截图标注索引表 §6、EARS 句式 §11） | 合并 示例仓库 4 项补强 |
+| **PRD** | 10 章模板 | 14 模块（加成功指标 §7.0、开放问题 §14.0、截图标注索引表 §6、EARS 句式 §11） | 合并 姊妹工作流仓库 4 项补强 |
 | **防漏** | 19 guardrail + 19 spec checklist | **20 guardrail + spec 质量门**（机器门 `g001`/`g014` 在本轮示例需求实际抓到问题） | 实战验证防线有效 |
 
 ---

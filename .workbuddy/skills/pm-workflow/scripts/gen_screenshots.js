@@ -84,8 +84,8 @@ const INPAGE_HELPERS = `
 
 /*
  * 构造「切到指定屏」的触发脚本。按可靠性从高到低尝试三种策略：
- *   ① 页面自带切屏函数（go / show / select / nav / switchPage / goTo）——示例A原型用 go()，
- *      示例B原型用 select()，gen_prototype.py 生成的原型用 show()；函数名不一，故按候选名逐个探测。
+ *   ① 页面自带切屏函数（go / show / select / nav / switchPage / goTo）——手写原型常用 go()，
+ *      也有原型用 select()，gen_prototype.py 生成的原型用 show()；函数名不一，故按候选名逐个探测。
  *   ② 直接 DOM 切换：给目标 <section id> 或 .page 加 active 类，其余移除
  *      （gen_prototype.py 的 CSS 约定即 .page{display:none} / .page.active{display:block}）。
  *   ③ 兜底：改 display 内联样式，确保即使无 active 约定也能出图。
@@ -124,7 +124,7 @@ async function resolveScreens(page, file) {
     trigger: buildAutoTrigger(id),
   }));
   if (ids.includes('game')) {
-    // 示例A类原型有「困难」变体：优先 go('game',{mode:'hard'})，函数不存在时退回 DOM 兜底
+    // 含 game 屏的原型常有难度变体：优先 go('game',{mode:'hard'})，函数不存在时退回 DOM 兜底
     screens.push({
       name: 'game-hard',
       trigger: buildAutoTrigger('game', { mode: 'hard' }),
