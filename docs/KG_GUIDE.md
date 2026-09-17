@@ -25,9 +25,9 @@
 
 | 类型 | 标识 | 说明 | 示例 |
 |---|---|---|---|
-| **Persona** | `*.PERSONA.NNN` | 用户画像 | `示例REQ-A.PERSONA.001`（持仓复盘者） |
-| **Scenario** | `*.SCENARIO.NNN` | 用户场景卡 | `示例REQ-B.SCENARIO.002`（策略想法验证+回测） |
-| **Insight** | `*.INSIGHT.NNN` | 关键洞察（含反例 `counter_example`） | `示例REQ-A.INSIGHT.002`（个人不需要专业回测，**反例**） |
+| **Persona** | `*.PERSONA.NNN` | 用户画像 | `REQ-DEMO-A.PERSONA.001`（持仓复盘者） |
+| **Scenario** | `*.SCENARIO.NNN` | 用户场景卡 | `REQ-DEMO-B.SCENARIO.002`（策略想法验证+回测） |
+| **Insight** | `*.INSIGHT.NNN` | 关键洞察（含反例 `counter_example`） | `REQ-DEMO-A.INSIGHT.002`（个人不需要专业回测，**反例**） |
 | **Feature** | `*.FEATURE.NNN` | 功能点描述 | `REQ-005.FEATURE.003`（AI 自动应答 RAG 检索） |
 | **Lesson** | `lesson.NNN` | 跨 REQ 的教训 | `lesson.008`（数据持久化方案模糊） |
 
@@ -121,12 +121,12 @@ kg_refs:
 ```yaml
 ## 知识图谱引用
 kg_refs:
-  - entity_id: 示例REQ-B.SCENARIO.002
+  - entity_id: REQ-DEMO-B.SCENARIO.002
     role: reference
     note: 前序「示例分析平台 V2」的「策略想法验证+回测」场景，本需求 S2 的直接前身
-  - entity_id: 示例REQ-A.INSIGHT.002
+  - entity_id: REQ-DEMO-A.INSIGHT.002
     role: counter_example
-    note: 前序 示例REQ-A 判定「个人不需要专业级计算」，本轮竞品对齐（同类平台若干
+    note: 前序 REQ-DEMO-A 判定「个人不需要专业级计算」，本轮竞品对齐（同类平台若干
       均已把基准对比/样本外当默认能力）推翻该假设。作真实反例，防止后续沿用旧模板。
   - entity_id: lesson.008
     role: template

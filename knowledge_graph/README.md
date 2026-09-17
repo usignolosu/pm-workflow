@@ -34,8 +34,8 @@ knowledge_graph/
 │   │   ├── fr.yaml
 │   │   └── relations.yaml
 │   ├── REQ-002/...
-│   ├── 示例REQ-A/...
-│   └── 示例REQ-B/...
+│   ├── REQ-DEMO-A/...
+│   └── REQ-DEMO-B/...
 └── _overproduced/             # 降级时归档"超出当前等级"的产物
 ```
 
@@ -71,7 +71,7 @@ knowledge_graph/
 | constrains | ComplianceRule → FR | `REQ-001.COMPLIANCE.001 constrains REQ-001.FR.001` |
 | implements | TechComponent → FR | `REQ-001.TECH.001 implements REQ-001.FR.001` |
 | references | Annotation → FR | `REQ-001.ANNO.001 references REQ-001.FR.001` |
-| derived-from | Lesson/Entity → REQ | `lesson.001 derived-from 示例REQ-B` |
+| derived-from | Lesson/Entity → REQ | `lesson.001 derived-from REQ-DEMO-B` |
 | applies-to | Guardrail → Agent | `g001 applies-to all` |
 
 ## 使用方式

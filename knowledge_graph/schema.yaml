@@ -75,7 +75,7 @@ entity_types:
       id: "lesson.001"
       title: "数据源降级链路必须写完整"
       severity: "HIGH"
-      description: "示例REQ-A 早期只写了 1 级降级，遇到 主数据源 限流时用户看到空白页"
+      description: "REQ-DEMO-A 早期只写了 1 级降级，遇到 主数据源 限流时用户看到空白页"
       remediation: "原型-A1 契约加 Guardrail #g011 强制 4 级降级"
       linked_guardrails: ["g011"]
       source: "workflow/lessons.md#L1"

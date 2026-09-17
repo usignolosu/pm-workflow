@@ -8,7 +8,7 @@
   actual_consequence: "开发中需要额外加'数据更新时间'字段、修改 API 返回结构、前端展示。"
   remediation: "PRD 功能说明模板增加'数据时间戳'必填子节"
   linked_guardrails: ["g010"]
-  derived_from: 示例REQ-B
+  derived_from: REQ-DEMO-B
   source: "workflow/lessons.md#L7"
   created: 2026-07-03
   status: legacy
@@ -25,7 +25,7 @@
   actual_consequence: "开发中需要补 第三方数据源适配器 + 复合数据源 + 离线新闻样本库"
   remediation: "PRD 功能说明模板增加'数据降级链路'必填子节，明确 3 级降级 + 每级用户影响"
   linked_guardrails: ["g011"]
-  derived_from: 示例REQ-B
+  derived_from: REQ-DEMO-B
   source: "workflow/lessons.md#L18"
   created: 2026-07-03
   status: legacy
@@ -41,7 +41,7 @@
   actual_consequence: "多次修复 + 1 次'HIGH bug'修复"
   remediation: "PRD 功能说明模板增加'算法边界'子节，覆盖零输入/单值输入/整除边界/索引越界/时序靠后数据不完整"
   linked_guardrails: ["g012"]
-  derived_from: 示例REQ-B
+  derived_from: REQ-DEMO-B
   source: "workflow/lessons.md#L32"
   created: 2026-07-03
   status: legacy
@@ -57,7 +57,7 @@
   actual_consequence: "1 次'原型对齐修复'commit，修改了 21 个文件"
   remediation: "新增 Guardrail #13'原型-实施对齐契约'。评审组在原型产出后必须做'原型-PRD对齐检查'"
   linked_guardrails: ["g013"]
-  derived_from: 示例REQ-B
+  derived_from: REQ-DEMO-B
   source: "workflow/lessons.md#L43"
   created: 2026-07-03
   status: legacy
@@ -72,7 +72,7 @@
   actual_consequence: "开发中改为 asyncio.gather + asyncio.to_thread 并行拉取，修复为'HIGH bug'"
   remediation: "TDL 新增'并行/串行策略'条目。评审组新增'并发性能检查'"
   linked_guardrails: []
-  derived_from: 示例REQ-B
+  derived_from: REQ-DEMO-B
   source: "workflow/lessons.md#L54"
   created: 2026-07-03
   status: legacy
@@ -85,7 +85,7 @@
   actual_consequence: "全局修改所有 Python 文件，补充 `from __future__ import annotations` + typing 导入"
   remediation: "TDL 新增'最低运行时版本（详细）'条目"
   linked_guardrails: []
-  derived_from: 示例REQ-B
+  derived_from: REQ-DEMO-B
   source: "workflow/lessons.md#L64"
   created: 2026-07-03
   status: legacy
@@ -98,7 +98,7 @@
   actual_consequence: "重构为 dependencies.py 统一注入"
   remediation: "TDL 新增'循环依赖防护'条目，评审组审核检查依赖图单向性"
   linked_guardrails: []
-  derived_from: 示例REQ-B
+  derived_from: REQ-DEMO-B
   source: "workflow/lessons.md#L75"
   created: 2026-07-03
   status: legacy
@@ -113,7 +113,7 @@
   actual_consequence: "开发中需要在多处加 localStorage 持久化和恢复逻辑"
   remediation: "PRD 功能说明模板加强'数据持久化'子节，明确刷新保留/清除条件"
   linked_guardrails: ["g009"]
-  derived_from: 示例REQ-B
+  derived_from: REQ-DEMO-B
   source: "workflow/lessons.md#L87"
   created: 2026-07-03
   status: legacy
@@ -126,7 +126,7 @@
   actual_consequence: "改为 fallback 优先策略：先用内置新闻样本，主数据源 实时新闻作为备选"
   remediation: "PRD 功能说明模板的'数据降级链路'子节强调新闻/搜索等非核心功能的降级策略"
   linked_guardrails: ["g011"]
-  derived_from: 示例REQ-B
+  derived_from: REQ-DEMO-B
   source: "workflow/lessons.md#L98"
   created: 2026-07-03
   status: legacy

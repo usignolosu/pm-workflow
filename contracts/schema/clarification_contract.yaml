@@ -156,6 +156,6 @@ validator:
 # 历史 REQ 豁免
 # -----------------------------------------------------------------------------
 legacy_waivers:
-  applies_to_req_ids: [REQ-001, REQ-002, 示例REQ-A, 示例REQ-B]
+  applies_to_req_ids: [REQ-001, REQ-002, REQ-DEMO-A, REQ-DEMO-B]
   default_clarification_skipped: true
   note: "历史 REQ 在澄清门引入前完成，校验器自动豁免 clarification_format"

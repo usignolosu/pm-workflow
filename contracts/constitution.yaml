@@ -1,7 +1,7 @@
 # 项目宪法（Constitution）—— 需求无关的产品原则红线
 # =========================================================================
 # v4.0 新增（借鉴 GitHub Spec Kit 的 constitution 概念）
-# 来源：workflow/lessons.md（示例REQ-B 实施的 9 条教训）+ 高频 Guardrail 归纳
+# 来源：workflow/lessons.md（REQ-DEMO-B 实施的 9 条教训）+ 高频 Guardrail 归纳
 # 用法：
 #   - 所有 Agent Load Order 第 -1 步必读（见 contracts/schema/load_order.yaml#pre_load）
 #   - reviewer审核时逐条人工对照；机器部分由 validate_contract.py 加载并提示

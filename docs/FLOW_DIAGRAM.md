@@ -172,8 +172,8 @@ kg_refs:
 **当前图谱**：31 实体 / 27 文件（合并 姊妹工作流仓库 + 本工作区演化），覆盖 `Persona` / `Scenario` / `Insight` / `Feature` / `Lesson` 五类。
 
 **典型用例**（示例需求，run-id `demo-20260101`）：
-- `示例REQ-B.SCENARIO.002`（reference）—— 前序「示例分析平台 V2」的「策略想法验证+回测」场景，本需求 S2 的直接前身
-- `示例REQ-A.INSIGHT.002`（counter_example）—— 前序判定「个人用户不需要专业级计算」，本轮竞品对齐推翻此假设，作真实反例
+- `REQ-DEMO-B.SCENARIO.002`（reference）—— 前序「示例分析平台 V2」的「策略想法验证+回测」场景，本需求 S2 的直接前身
+- `REQ-DEMO-A.INSIGHT.002`（counter_example）—— 前序判定「个人用户不需要专业级计算」，本轮竞品对齐推翻此假设，作真实反例
 - `lesson.008`（template）—— 教训「数据持久化方案模糊」→ 本需求 §6.12 以服务端 SQLite 替代 localStorage
 
 ---
