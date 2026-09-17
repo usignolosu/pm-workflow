@@ -15,6 +15,7 @@ import argparse
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
 
 def detect_root() -> Path:
     """Route X+: 过程留痕写到工作区根，避免随 Skill 包分发出去。"""
