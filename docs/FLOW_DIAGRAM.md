@@ -169,7 +169,7 @@ kg_refs:
     note: 引用理由（为什么参考 / 哪个字段借鉴了 / 为什么是反例）
 ```
 
-**当前图谱**：128 实体 / 49 文件（合并 示例仓库 + 本工作区演化），覆盖 `Persona` / `Scenario` / `Insight` / `Feature` / `Lesson` 五类。
+**当前图谱**：31 实体 / 27 文件（合并 示例仓库 + 本工作区演化），覆盖 `Persona` / `Scenario` / `Insight` / `Feature` / `Lesson` 五类。
 
 **典型用例**（示例需求，run-id `demo-20260101`）：
 - `示例REQ-B.SCENARIO.002`（reference）—— 前序「示例分析平台 V2」的「策略想法验证+回测」场景，本需求 S2 的直接前身
@@ -192,7 +192,7 @@ kg_refs:
 │   └── PRD产品需求文档.md  高保真原型/  screenshots/  QA评审报告.md  ...
 ├── 归档需求产出/<REQ-ID>/              # 历史归档（保留原编号）
 ├── contracts/                          # 契约（constitution / guardrails / spec_checklist）
-└── knowledge_graph/                    # 知识图谱（128 实体）
+└── knowledge_graph/                    # 知识图谱（31 实体）
 ```
 
 **约定**：`runs/` 是**执行流**（过程产物，含 `execution-log.md`），`<需求名>需求产出/` 是**长期归口**（已交付可见副本）。

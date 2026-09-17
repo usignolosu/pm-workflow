@@ -31,7 +31,7 @@ Pm Workflow的所有显著变更均记录于此。格式基于 [Keep a Changelog
 - **19 → 20 条**：新增 `g014 KG 必填`（standard/complex 必填 kg_refs，至少 1 条 `role: counter_example` 防模板污染）
 
 #### KG
-- **22 实体（仅 guardrail）→ 128 实体**（合并 示例仓库 + 本工作区演化）
+- **22 实体（仅 guardrail）→ 31 实体**（合并 示例仓库 + 本工作区演化）
 
 #### PRD 模板
 - **10 章 → 14 模块**：吸收 示例仓库 4 项补强（§7.0 成功指标 / §14.0 开放问题 / §6 截图标注索引表 / §11 EARS 句式强制）

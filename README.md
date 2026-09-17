@@ -201,7 +201,7 @@ pm-workflow/
 │   ├── design_tokens.yaml              ← 设计系统 token
 │   ├── spec_checklist.yaml             ← spec 质量门
 │   └── schema/                         ← agent / guardrail / kg 契约
-├── knowledge_graph/                    ← 知识图谱（49 文件 / 128 实体）
+├── knowledge_graph/                    ← 知识图谱（27 文件 / 31 实体）
 ├── docs/                               ← 用户文档
 │   ├── FLOW_DIAGRAM.md                 ← 主流程图（mermaid）
 │   ├── KG_GUIDE.md                    ← 知识图谱指南
